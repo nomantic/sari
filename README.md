@@ -17,9 +17,25 @@ nel calendario e scarica.
 | --- | --- |
 | `/` | Calendario cronologico: le lezioni di oggi, poi quelle future. Ricerca per insegnamento/docente/aula, filtro per anno, "solo con materiali". Ogni scheda apre i materiali e il caricamento. |
 | `/corsi` | Tutti gli insegnamenti divisi per anno e per percorso (giuridico, storico-politico, economico). |
-| `/corsi/[slug]` | Una scheda per insegnamento: orario settimanale ufficiale, numero di lezioni, copertura dei materiali, e **ogni lezione in ordine cronologico**. |
-| `/carica` | Procedura guidata in 3 passi: insegnamento → data e ora → file. |
+| `/corsi/[slug]` | Una scheda per insegnamento: orario settimanale ufficiale, numero di lezioni, copertura dei materiali, **materiali d'esame** e **ogni lezione in ordine cronologico**. |
+| `/carica` | Procedura guidata in 3 passi: insegnamento → lezione (o materiali d'esame) → file. |
 | `/moderatore` | Accesso del moderatore per eliminare materiali errati o duplicati. |
+
+### Due tipi di materiale
+
+Ogni insegnamento ha **due raccolte separate**, tutte e due con lo stesso meccanismo di
+caricamento, download ed eliminazione:
+
+1. **Materiale della lezione** — legato a *data e ora*: apri la lezione giusta nel
+   calendario e carica lì. Serve per trovare «le slide di martedì».
+2. **Materiali d'esame** — legato alla *materia*, non a una data: slide complete,
+   riassunti, prove d'esame passate, domande frequenti. Si carica dalla sezione
+   **Materiali d'esame** in cima alla scheda dell'insegnamento, oppure scegliendo
+   «Materiali d'esame» nella pagina `/carica`.
+
+I due contenitori restano distinti anche nello storage e nelle API: non è possibile
+caricare un file d'esame dentro una lezione (o viceversa), e le chiavi di un insegnamento
+fuori perimetro vengono rifiutate.
 
 ### Permessi (come richiesto)
 
@@ -128,9 +144,12 @@ Layout nel bucket:
 ```
 sari/
 ├── sari-manifest.json                                  ← indice di tutti i materiali
-└── sessions/
-    └── storia-contemporanea-2026-10-27-1100/
-        └── a1b2c3d4__slide-lezione.pdf                ← <uuid8>__<nome file>
+├── sessions/                                           ← materiale di una lezione
+│   └── storia-contemporanea-2026-10-27-1100/
+│       └── a1b2c3d4__slide-lezione.pdf                 ← <uuid8>__<nome file>
+└── exams/                                              ← materiale d'esame
+    └── storia-contemporanea/
+        └── b9e4f1c2__prova-esame-2025.pdf
 ```
 
 ### Configurazione
