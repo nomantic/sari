@@ -64,7 +64,7 @@ export function NavMenu() {
         ))}
       </nav>
 
-      {/* Narrow layout: everything lives in one dropdown that fills the screen width. */}
+      {/* Narrow layout: a three-line icon opens one full-width dropdown. */}
       <div ref={wrapper} className="relative shrink-0 lg:hidden">
         <button
           type="button"
@@ -75,12 +75,28 @@ export function NavMenu() {
           aria-expanded={isOpen}
           aria-controls={menuId}
           aria-haspopup="menu"
-          aria-label="Apri il menu di navigazione"
-          className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-line-strong bg-surface-3 px-3 text-sm font-semibold text-strong transition-colors hover:bg-surface-3"
+          aria-label={isOpen ? "Chiudi il menu di navigazione" : "Apri il menu di navigazione"}
+          className="relative grid h-10 w-10 place-items-center rounded-xl border border-line bg-surface-2 text-muted transition-colors hover:border-line-strong hover:bg-surface-3 hover:text-strong"
         >
-          Menu
-          <span aria-hidden className={`text-[10px] transition-transform ${isOpen ? "rotate-180" : ""}`}>
-            ▼
+          {/* Three lines that fold into a cross when open. */}
+          <span aria-hidden className="relative block h-3.5 w-[18px]">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="absolute left-0 h-[1.75px] w-full rounded-full bg-current transition-all duration-200 ease-out"
+                style={{
+                  top: `${i * 6}px`,
+                  opacity: isOpen && i === 1 ? 0 : 1,
+                  transform: isOpen
+                    ? i === 0
+                      ? "translateY(6px) rotate(45deg)"
+                      : i === 2
+                        ? "translateY(-6px) rotate(-45deg)"
+                        : "scaleX(0)"
+                    : "none",
+                }}
+              />
+            ))}
           </span>
         </button>
 
@@ -88,11 +104,16 @@ export function NavMenu() {
           <div
             id={menuId}
             role="menu"
-            className="fixed inset-x-3 top-[4.25rem] z-50 overflow-hidden rounded-xl border border-line-strong bg-surface shadow-2xl shadow-black/60 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[min(92vw,22rem)]"
+            className="menu-panel fixed inset-x-3 top-[4.25rem] z-50 overflow-hidden rounded-xl border border-line-strong bg-surface shadow-2xl shadow-black/30 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[min(92vw,22rem)]"
           >
             <ul className="py-1">
-              {LINKS.map((link) => (
-                <li key={link.href} role="none">
+              {LINKS.map((link, index) => (
+                <li
+                  key={link.href}
+                  role="none"
+                  className="menu-row"
+                  style={{ animationDelay: `${40 + index * 28}ms` }}
+                >
                   <Link
                     role="menuitem"
                     href={link.href}
@@ -127,6 +148,7 @@ export function NavMenu() {
           </div>
         )}
       </div>
+
     </>
   );
 }

@@ -173,3 +173,34 @@ body {
   background-size: 800px 100%;
   animation: shimmer 1.6s infinite linear;
 }
+
+/* ── Mobile menu ─────────────────────────────────────────────
+   The panel drops from the header while fading in; each row follows with a
+   small stagger so the list reads as unfolding rather than popping. */
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes menu-row-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.menu-panel {
+  animation: menu-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: top center;
+}
+
+.menu-row {
+  animation: menu-row-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Anyone who asked for less motion gets the panel without movement. */
+@media (prefers-reduced-motion: reduce) {
+  .menu-panel,
+  .menu-row {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+  }
+}
