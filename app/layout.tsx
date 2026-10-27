@@ -7,7 +7,7 @@ import { NavMenu } from "@/components/nav-menu";
 import { NoticesBar } from "@/components/notices-bar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Wordmark } from "@/components/wordmark";
-import { ACADEMIC_YEAR, SOURCE_URLS } from "@/lib/constants";
+import { ACADEMIC_YEAR, DEVELOPER, SOURCE_URLS } from "@/lib/constants";
 
 /**
  * Display serif for the SARI wordmark only. Self-hosted by Next at build time,
@@ -81,7 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main">{children}</main>
 
         <footer className="mt-20 border-t border-line bg-surface-2">
-          <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 text-sm sm:px-6 md:grid-cols-3">
+          <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 text-sm sm:px-6 md:grid-cols-2 lg:grid-cols-4">
             <div>
               <p className="font-semibold text-strong">
                 Scienze dell&apos;Amministrazione e delle Relazioni Internazionali
@@ -115,13 +115,61 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </li>
               </ul>
             </div>
+
+            {/* Chi c'è dietro al sito */}
             <div>
-              <p className="font-semibold text-strong">Nota</p>
+              <p className="font-semibold text-strong">Chi ha fatto questo sito</p>
               <p className="mt-2 text-faint">
-                Strumento collaborativo non ufficiale. I materiali sono caricati dagli studenti; verificare sempre
-                programma e orari sul sito ufficiale dell&apos;Ateneo.
+                Sviluppato da uno studente di SARI, per rendere i materiali del corso facili da trovare e da condividere.
               </p>
-              <Link href="/admin" className="mt-3 inline-block text-xs text-faint underline-offset-4 hover:text-strong hover:underline">
+              <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-faint">Sviluppatore</p>
+              <ul className="mt-1 space-y-1 text-faint">
+                <li>
+                  <a
+                    className="inline-flex items-center gap-1.5 hover:text-strong"
+                    href={DEVELOPER.instagramUrl}
+                    target="_blank"
+                    rel="noreferrer noopener me"
+                  >
+                    <span aria-hidden>↗</span> Instagram · {DEVELOPER.instagramHandle}
+                  </a>
+                </li>
+                <li>
+                  <a className="inline-flex items-center gap-1.5 hover:text-strong" href={DEVELOPER.converseryUrl} target="_blank" rel="noreferrer noopener">
+                    <span aria-hidden>↗</span> conversery.com
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Curiosità: l'altro progetto dello sviluppatore */}
+            <div>
+              <p className="font-semibold text-strong">Conversery</p>
+              <p className="mt-2 text-faint">
+                Un&apos;app per imparare le lingue con storie e conversazioni generate dall&apos;intelligenza artificiale,
+                disponibile gratuitamente su Google Play.
+              </p>
+              <a
+                href={DEVELOPER.converseryPlayUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="mt-3 inline-flex items-center gap-2 rounded-lg border border-line bg-surface px-2.5 py-1.5 text-xs font-medium text-body transition-colors hover:border-line-strong hover:text-strong"
+              >
+                <span aria-hidden className="text-[13px] leading-none">
+                  ▶
+                </span>
+                Google Play · Conversery AI
+              </a>
+            </div>
+          </div>
+
+          <div className="border-t border-line">
+            <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-faint sm:px-6">
+              <p>
+                Strumento collaborativo <strong className="font-semibold text-muted">non ufficiale</strong>: i materiali
+                sono caricati dagli studenti. Per programmi e orari fa fede il sito dell&apos;Ateneo.
+              </p>
+              <Link href="/admin" className="underline-offset-4 hover:text-strong hover:underline">
                 Amministrazione
               </Link>
             </div>

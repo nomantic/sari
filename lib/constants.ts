@@ -41,3 +41,15 @@ export const SOURCE_URLS = {
   semesterTwo: "https://scienzepolitiche.uniroma2.it/lezioni-2-semestre/",
   manifesto: "https://scienzepolitiche.uniroma2.it/pagina-2/",
 };
+
+/**
+ * Who made the site, shown in the footer. Kept here so the links can change in
+ * one place. The Play Store link is Conversery's real listing (package
+ * com.nomantic.conversery), not a guessed URL.
+ */
+export const DEVELOPER = {
+  instagramHandle: "@the.avalancher",
+  instagramUrl: "https://www.instagram.com/the.avalancher/",
+  converseryUrl: "https://conversery.com",
+  converseryPlayUrl: "https://play.google.com/store/apps/details?id=com.nomantic.conversery",
+};
