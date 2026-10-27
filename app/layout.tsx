@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { NavSearch } from "@/components/nav-search";
+import { NavMenu } from "@/components/nav-menu";
+import { NoticesBar } from "@/components/notices-bar";
 import { ACADEMIC_YEAR, SOURCE_URLS } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -50,28 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <NavSearch />
               </div>
 
-              <nav aria-label="Principale" className="ml-auto flex shrink-0 items-center gap-0.5 text-sm md:ml-0">
-                <Link href="/" className="rounded-lg px-1.5 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-2.5">
-                  Oggi
-                </Link>
-                <Link href="/calendario" className="rounded-lg px-1.5 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-2.5">
-                  <span className="hidden sm:inline">Calendario</span>
-                  <span className="sm:hidden">Cal.</span>
-                </Link>
-                <Link href="/avvisi" className="rounded-lg px-1.5 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-2.5">
-                  Avvisi
-                </Link>
-                <Link href="/corsi" className="rounded-lg px-1.5 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-2.5">
-                  Materie
-                </Link>
-                <Link
-                  href="/carica"
-                  className="ml-1 rounded-lg bg-white/8 px-2 py-2 font-medium text-white transition-colors hover:bg-white/14 sm:px-2.5"
-                >
-                  <span className="hidden lg:inline">Carica materiale</span>
-                  <span className="lg:hidden">Carica</span>
-                </Link>
-              </nav>
+              <NavMenu />
             </div>
 
             {/* On phones the search gets its own row so nothing overflows. */}
@@ -80,6 +61,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
         </header>
+
+        {/* Notices sit right under the navbar, on every page. */}
+        <NoticesBar />
 
         <main id="main">{children}</main>
 

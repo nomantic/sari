@@ -64,7 +64,7 @@ export function LessonFeed({ entries, today, yearLabels }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="surface sticky top-16 z-30 -mx-1 p-3 backdrop-blur-xl">
+      <div className="surface sticky top-[7.5rem] z-30 -mx-1 p-3 backdrop-blur-xl sm:top-24">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-mist-300">
           <label className="inline-flex items-center gap-1.5">
             <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
