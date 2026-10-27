@@ -36,8 +36,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <header className="sticky top-0 z-40 border-b border-white/8 bg-ink-950/80 backdrop-blur-xl">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            {/* One row everywhere: logo, search, menu. On phones the search
+                shares the row instead of taking an extra one. */}
             <div className="flex h-16 items-center gap-2 sm:gap-3">
-              <Link href="/" className="group flex shrink-0 items-center gap-3">
+              <Link href="/" className="group flex shrink-0 items-center gap-3" aria-label="SARI — pagina iniziale">
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-500 text-sm font-black tracking-tight text-white shadow-lg shadow-brand-500/25">
                   SA
                 </span>
@@ -47,17 +49,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </span>
               </Link>
 
-              {/* Search sits in the header on every page: it is the fastest way in. */}
-              <div className="ml-auto hidden flex-1 justify-center md:flex">
-                <NavSearch />
+              {/* Search lives in the navbar at every size — it is the fastest way in. */}
+              <div className="min-w-0 flex-1 md:flex md:justify-center">
+                <NavSearch compact />
               </div>
 
               <NavMenu />
-            </div>
-
-            {/* On phones the search gets its own row so nothing overflows. */}
-            <div className="pb-3 md:hidden">
-              <NavSearch compact />
             </div>
           </div>
         </header>

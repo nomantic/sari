@@ -129,7 +129,7 @@ export function NavSearch({ compact = false }: { compact?: boolean }) {
         Cerca nel sito
       </label>
       <div className="relative">
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-mist-400" aria-hidden>
+        <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-mist-400 sm:left-3" aria-hidden>
           ⌕
         </span>
         <input
@@ -141,8 +141,9 @@ export function NavSearch({ compact = false }: { compact?: boolean }) {
           aria-controls={listId}
           aria-autocomplete="list"
           autoComplete="off"
-          className="w-full rounded-lg border border-white/10 bg-ink-950/70 py-2 pl-9 pr-3 text-sm text-white placeholder:text-mist-400/70 focus:border-brand-400/60 focus:outline-none"
-          placeholder="Cerca materia, lezione, avviso…"
+          className="h-10 w-full rounded-xl border border-white/10 bg-ink-950/70 pl-8 pr-2 text-sm text-white placeholder:text-mist-400/70 focus:border-brand-400/60 focus:outline-none sm:pl-9 sm:pr-3"
+          placeholder="Cerca…"
+          aria-label="Cerca materia, lezione o avviso"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onFocus={() => value.trim().length >= 2 && setOpen(true)}

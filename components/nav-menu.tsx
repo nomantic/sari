@@ -64,8 +64,8 @@ export function NavMenu() {
         ))}
       </nav>
 
-      {/* Narrow layout: everything lives in one dropdown. */}
-      <div ref={wrapper} className="relative ml-auto shrink-0 lg:hidden">
+      {/* Narrow layout: everything lives in one dropdown that fills the screen width. */}
+      <div ref={wrapper} className="relative shrink-0 lg:hidden">
         <button
           type="button"
           onClick={() => {
@@ -76,7 +76,7 @@ export function NavMenu() {
           aria-controls={menuId}
           aria-haspopup="menu"
           aria-label="Apri il menu di navigazione"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/8 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/14"
+          className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-white/12 bg-white/8 px-3 text-sm font-semibold text-white transition-colors hover:bg-white/14"
         >
           Menu
           <span aria-hidden className={`text-[10px] transition-transform ${isOpen ? "rotate-180" : ""}`}>
@@ -88,7 +88,7 @@ export function NavMenu() {
           <div
             id={menuId}
             role="menu"
-            className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-white/12 bg-ink-900 shadow-2xl shadow-black/50"
+            className="fixed inset-x-3 top-[4.25rem] z-50 overflow-hidden rounded-xl border border-white/12 bg-ink-900 shadow-2xl shadow-black/60 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[min(92vw,22rem)]"
           >
             <ul className="py-1">
               {LINKS.map((link) => (
@@ -100,12 +100,17 @@ export function NavMenu() {
                     onClick={() => {
                       setOpen(false);
                     }}
-                    className={`block px-3 py-2.5 transition-colors ${
+                    className={`flex items-center gap-3 px-4 py-3.5 transition-colors ${
                       isActive(link.href) ? "bg-brand-500/15 text-white" : "text-mist-200 hover:bg-white/6 hover:text-white"
                     }`}
                   >
-                    <span className="block text-sm font-medium">{link.label}</span>
-                    <span className="mt-0.5 block text-[11px] text-mist-400">{link.description}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[15px] font-medium">{link.label}</span>
+                      <span className="mt-0.5 block text-[11px] text-mist-400">{link.description}</span>
+                    </span>
+                    <span aria-hidden className="shrink-0 text-mist-400">
+                      →
+                    </span>
                   </Link>
                 </li>
               ))}
@@ -113,9 +118,9 @@ export function NavMenu() {
             <Link
               href="/admin"
               onClick={() => {
-                      setOpen(false);
-                    }}
-              className="block border-t border-white/8 px-3 py-2 text-[11px] text-mist-400 hover:text-white"
+                setOpen(false);
+              }}
+              className="block border-t border-white/8 px-4 py-3 text-xs text-mist-400 hover:text-white"
             >
               Amministrazione
             </Link>

@@ -64,11 +64,13 @@ export function LessonFeed({ entries, today, yearLabels }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="surface sticky top-[7.5rem] z-30 -mx-1 p-3 backdrop-blur-xl sm:top-24">
+      {/* Sticky on desktop only: on phones it would eat half the screen while
+          scrolling and hide the month headings underneath it. */}
+      <div className="surface p-3 md:sticky md:top-24 md:z-30 md:backdrop-blur-xl">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-mist-300">
           <label className="inline-flex items-center gap-1.5">
             <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
-            Mostra anche le lezioni passate
+            Mostra anche le passate
           </label>
           <label className="inline-flex items-center gap-1.5">
             <input type="checkbox" checked={onlyWithFiles} onChange={(e) => setOnlyWithFiles(e.target.checked)} />
@@ -113,7 +115,8 @@ export function LessonFeed({ entries, today, yearLabels }: Props) {
               {showMonth && (
                 <h2 className="pt-2 text-xs font-bold uppercase tracking-[0.18em] text-gold-400">{month}</h2>
               )}
-              <div className="grid gap-3">
+              {/* min-w-0 keeps grid children from being stretched by a wide chip row. */}
+              <div className="grid min-w-0 gap-3">
                 {items.map(({ session, files }) => (
                   <LessonCard
                     key={session.id}

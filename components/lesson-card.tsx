@@ -36,7 +36,7 @@ export function LessonCard({ session, files, isPast, isToday, dense }: Props) {
   return (
     <Link
       href={`/lezione/${session.id}`}
-      className={`surface card-hover group flex items-center gap-3 p-3 sm:gap-4 sm:p-4 ${
+      className={`surface card-hover group flex w-full min-w-0 items-center gap-3 p-3 sm:gap-4 sm:p-4 ${
         isToday ? "border-brand-400/40 ring-1 ring-brand-400/20" : ""
       }`}
       aria-label={`${session.courseName}, ${session.date} ${timeOf(session.start)}, ${files.length} materiali`}
