@@ -34,14 +34,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <header className="sticky top-0 z-40 border-b border-white/8 bg-ink-950/80 backdrop-blur-xl">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="flex h-16 items-center gap-3">
+            <div className="flex h-16 items-center gap-2 sm:gap-3">
               <Link href="/" className="group flex shrink-0 items-center gap-3">
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-500 text-sm font-black tracking-tight text-white shadow-lg shadow-brand-500/25">
                   SA
                 </span>
-                <span className="leading-tight">
+                <span className="hidden leading-tight sm:block">
                   <span className="block text-sm font-bold text-white">SARI</span>
-                  <span className="hidden text-[11px] text-mist-400 sm:block">Materiali e avvisi · {ACADEMIC_YEAR}</span>
+                  <span className="hidden text-[11px] text-mist-400 lg:block">Materiali e avvisi · {ACADEMIC_YEAR}</span>
                 </span>
               </Link>
 
@@ -51,18 +51,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
 
               <nav aria-label="Principale" className="ml-auto flex shrink-0 items-center gap-0.5 text-sm md:ml-0">
-                <Link href="/" className="rounded-lg px-2 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-3">
-                  Calendario
+                <Link href="/" className="rounded-lg px-1.5 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-2.5">
+                  Oggi
                 </Link>
-                <Link href="/avvisi" className="rounded-lg px-2 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-3">
+                <Link href="/calendario" className="rounded-lg px-1.5 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-2.5">
+                  <span className="hidden sm:inline">Calendario</span>
+                  <span className="sm:hidden">Cal.</span>
+                </Link>
+                <Link href="/avvisi" className="rounded-lg px-1.5 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-2.5">
                   Avvisi
                 </Link>
-                <Link href="/corsi" className="rounded-lg px-2 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-3">
+                <Link href="/corsi" className="rounded-lg px-1.5 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-2.5">
                   Materie
                 </Link>
                 <Link
                   href="/carica"
-                  className="ml-1 rounded-lg bg-white/8 px-2.5 py-2 font-medium text-white transition-colors hover:bg-white/14 sm:px-3"
+                  className="ml-1 rounded-lg bg-white/8 px-2 py-2 font-medium text-white transition-colors hover:bg-white/14 sm:px-2.5"
                 >
                   <span className="hidden lg:inline">Carica materiale</span>
                   <span className="lg:hidden">Carica</span>

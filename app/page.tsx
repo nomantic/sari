@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LessonFeed } from "@/components/lesson-feed";
+import { LessonViews } from "@/components/lesson-views";
 import { getCatalog } from "@/lib/catalog";
 import { ACADEMIC_YEAR, SOURCE_URLS, YEAR_LABELS } from "@/lib/constants";
 import { ACTIVE_SCOPE } from "@/lib/scope";
@@ -193,7 +193,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <LessonFeed
+      <LessonViews
         entries={entries}
         uploadsEnabled={storageOk && process.env.UPLOADS_ENABLED !== "false"}
         isAdmin={await isAdminRequest()}
