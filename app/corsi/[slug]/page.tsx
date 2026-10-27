@@ -209,11 +209,8 @@ export default async function CoursePage({ params }: { params: Params }) {
                 <LessonCard
                   session={session}
                   files={bySession.get(session.id) ?? []}
-                  uploadsEnabled={uploadsEnabled}
-                  defaultOpen={session.id === nextSession?.id}
                   isToday={session.date === today}
                   isPast={session.date < today}
-                  isAdmin={isAdmin}
                 />
               </div>
             ))}

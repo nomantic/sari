@@ -16,14 +16,10 @@ interface Entry {
  */
 export function LessonViews({
   entries,
-  uploadsEnabled,
-  isAdmin,
   today,
   yearLabels,
 }: {
   entries: Entry[];
-  uploadsEnabled: boolean;
-  isAdmin: boolean;
   today: string;
   yearLabels: Record<number, string>;
 }) {
@@ -55,7 +51,7 @@ export function LessonViews({
       {view === "calendario" ? (
         <LessonCalendar entries={entries} today={today} />
       ) : (
-        <LessonFeed entries={entries} uploadsEnabled={uploadsEnabled} isAdmin={isAdmin} today={today} yearLabels={yearLabels} />
+        <LessonFeed entries={entries} today={today} yearLabels={yearLabels} />
       )}
     </div>
   );

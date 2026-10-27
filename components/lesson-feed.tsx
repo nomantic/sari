@@ -11,8 +11,6 @@ interface Entry {
 
 interface Props {
   entries: Entry[];
-  uploadsEnabled: boolean;
-  isAdmin?: boolean;
   today: string;
   yearLabels: Record<number, string>;
 }
@@ -27,7 +25,7 @@ function monthHeading(isoDate: string): string {
   return `${MONTH_LABELS[m - 1]} ${y}`;
 }
 
-export function LessonFeed({ entries, uploadsEnabled, today, yearLabels, isAdmin }: Props) {
+export function LessonFeed({ entries, today, yearLabels }: Props) {
   const [year, setYear] = useState<string>("all");
   const [showPast, setShowPast] = useState(false);
   const [onlyWithFiles, setOnlyWithFiles] = useState(false);
@@ -121,10 +119,8 @@ export function LessonFeed({ entries, uploadsEnabled, today, yearLabels, isAdmin
                     key={session.id}
                     session={session}
                     files={files}
-                    uploadsEnabled={uploadsEnabled}
                     isToday={session.date === today}
                     isPast={session.date < today}
-                    isAdmin={isAdmin}
                   />
                 ))}
               </div>

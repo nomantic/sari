@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LessonCard } from "@/components/lesson-card";
-import { isAdminRequest } from "@/lib/admin";
 import { getCatalog } from "@/lib/catalog";
 import { todayIso } from "@/lib/format";
 import { filesByTarget, isStorageConfigured } from "@/lib/storage";
@@ -63,9 +62,6 @@ export default async function DayPage({ params }: { params: Params }) {
       console.error("[giorno] indice materiali non disponibile:", err);
     }
   }
-
-  const uploadsEnabled = isStorageConfigured() && process.env.UPLOADS_ENABLED !== "false";
-  const isAdmin = await isAdminRequest();
 
   // Neighbouring days that actually have lessons, for quick navigation.
   const withLessons = Array.from(new Set(sessions.map((s) => s.date))).sort();
@@ -145,11 +141,8 @@ export default async function DayPage({ params }: { params: Params }) {
               key={session.id}
               session={session}
               files={byTarget.get(session.id) ?? []}
-              uploadsEnabled={uploadsEnabled}
-              defaultOpen
               isToday={date === today}
               isPast={date < today}
-              isAdmin={isAdmin}
             />
           ))}
         </div>
