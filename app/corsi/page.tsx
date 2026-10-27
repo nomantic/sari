@@ -10,8 +10,8 @@ import { examTargetId } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Insegnamenti",
-  description: "Tutti gli insegnamenti del corso SARI con calendario delle lezioni e materiali.",
+  title: "Materie",
+  description: "Tutte le materie del corso SARI con calendario delle lezioni e materiali.",
 };
 
 const AREA_TONE: Record<string, string> = {
@@ -39,21 +39,21 @@ export default async function CoursesPage() {
     { title: "Primo anno", items: courses.filter((c) => c.year === 1) },
     { title: "Secondo anno", items: courses.filter((c) => c.year === 2) },
     { title: "Terzo anno", items: courses.filter((c) => c.year === 3) },
-    { title: "Insegnamenti a scelta", items: courses.filter((c) => c.year === 0) },
+    { title: "Materie a scelta", items: courses.filter((c) => c.year === 0) },
   ].filter((group) => group.items.length > 0);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Insegnamenti</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Materie</h1>
       <p className="mt-3 max-w-2xl text-mist-300">
-        {ACTIVE_SCOPE.label} · l&apos;orario settimanale ufficiale è stato espanso in lezioni datate: apri un insegnamento per
-        vedere ogni lezione in ordine cronologico e caricare i materiali.
+        {ACTIVE_SCOPE.label} · qui trovi tutte le materie da studiare. Apri una materia per vedere le lezioni in ordine,
+        i materiali di ogni lezione e quelli per l&apos;esame.
       </p>
 
       {hiddenCount > 0 && (
         <p className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/8 bg-white/4 px-3 py-1.5 text-xs text-mist-400">
-          Sono attive le lezioni del {ACTIVE_SCOPE.label.toLowerCase()}. Gli altri insegnamenti dell&apos;anno accademico
-          ({hiddenCount}) verranno attivati col secondo semestre.
+          Sono attive le materie del {ACTIVE_SCOPE.label.toLowerCase()}. Le altre materie dell&apos;anno accademico
+          ({hiddenCount}) verranno attivate col secondo semestre.
         </p>
       )}
 

@@ -59,7 +59,7 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
     <div className="space-y-6">
       <ol className="flex items-center gap-2 text-xs font-medium">
         {[
-          { n: 1, label: "Insegnamento", done: Boolean(course) },
+          { n: 1, label: "Materia", done: Boolean(course) },
           { n: 2, label: "Data e ora / esame", done: Boolean(session) || isExam },
           { n: 3, label: "File", done: false },
         ].map((step) => (
@@ -78,14 +78,14 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
       </ol>
 
       <section className="surface p-4">
-        <h2 className="text-sm font-semibold text-white">1 · Quale insegnamento?</h2>
+        <h2 className="text-sm font-semibold text-white">1 · Quale materia?</h2>
         <input
           type="search"
           className="input mt-2"
-          placeholder="Cerca un insegnamento…"
+          placeholder="Cerca una materia…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          aria-label="Cerca insegnamento"
+          aria-label="Cerca materia"
         />
         <div className="scroll-thin mt-3 max-h-72 space-y-1.5 overflow-y-auto pr-1">
           {courses
@@ -142,7 +142,7 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
           </select>
           {sessionOptions.length === 0 && (
             <p className="mt-2 text-xs text-mist-400">
-              Nessuna lezione futura per questo insegnamento. Attiva «includi lezioni passate» per caricare materiali di una
+              Nessuna lezione futura per questa materia. Attiva «includi lezioni passate» per caricare materiali di una
               lezione già svolta.
             </p>
           )}
@@ -168,7 +168,7 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
             <Uploader sessionId={sessionId} sessionLabel={targetLabel} disabled={!uploadsEnabled} onUploaded={onUploaded} />
           ) : (
             <p className="rounded-xl border border-dashed border-white/10 px-3 py-6 text-center text-xs text-mist-400">
-              Scegli prima l&apos;insegnamento e la destinazione (lezione o materiali d&apos;esame).
+              Scegli prima la materia e la destinazione (lezione o materiali d&apos;esame).
             </p>
           )}
         </div>

@@ -55,13 +55,13 @@ export default async function HomePage() {
             Carica un materiale
           </Link>
           <Link href="/corsi" className="btn-ghost">
-            Sfoglia gli insegnamenti
+            Vedi le materie
           </Link>
         </div>
 
         <dl className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { label: "Insegnamenti", value: courses.length },
+            { label: "Materie", value: courses.length },
             { label: "Lezioni in calendario", value: sessions.length },
             { label: "Materiali delle lezioni", value: totalFiles },
             { label: "Materiali d'esame", value: examFiles },
@@ -100,10 +100,10 @@ export default async function HomePage() {
         <div className="mt-6 rounded-xl border border-white/8 bg-ink-900/50 p-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-mist-400">
-              Insegnamenti attivi · {ACTIVE_SCOPE.label}
+              Materie attive · {ACTIVE_SCOPE.label}
             </p>
             <Link href="/corsi" className="text-xs text-mist-400 underline-offset-4 hover:text-white hover:underline">
-              tutti gli insegnamenti →
+              tutte le materie →
             </Link>
           </div>
           <div className="mt-2 grid gap-2 sm:grid-cols-2">

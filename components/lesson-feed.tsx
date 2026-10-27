@@ -78,7 +78,7 @@ export function LessonFeed({ entries, uploadsEnabled, today, yearLabels }: Props
             <input
               type="search"
               className="input pl-9"
-              placeholder="Cerca insegnamento, docente, aula…"
+              placeholder="Cerca materia, docente, aula…"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);

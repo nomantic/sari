@@ -28,7 +28,7 @@ export const ACTIVE_SCOPE: Scope = {
   year: 1,
   semester: 1,
   label: "Primo anno · I semestre",
-  emptyHint: "Questo insegnamento non si tiene nel primo semestre del primo anno.",
+  emptyHint: "Questa materia non si tiene nel primo semestre del primo anno.",
 };
 
 export function isInScope(course: RawCourse, scope: Scope = ACTIVE_SCOPE): boolean {

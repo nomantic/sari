@@ -44,7 +44,7 @@ export async function POST(request: Request) {
   }
 
   const target = body.sessionId ? resolveTarget(String(body.sessionId)) : null;
-  if (!target) return NextResponse.json({ error: "Lezione o insegnamento non trovato." }, { status: 404 });
+  if (!target) return NextResponse.json({ error: "Materia o lezione non trovata." }, { status: 404 });
 
   const key = String(body.key ?? "");
   if (!isManagedKey(key) || !key.startsWith(keyPrefixFor(target))) {

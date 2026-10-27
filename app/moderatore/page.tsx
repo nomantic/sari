@@ -28,10 +28,12 @@ export default async function ModeratorPage() {
         {signedIn ? (
           <div className="surface p-5">
             <p className="text-sm text-emerald-300">Sessione moderatore attiva.</p>
-            <p className="mt-2 text-sm text-mist-300">Puoi eliminare qualsiasi materiale dalle pagine delle lezioni.</p>
+            <p className="mt-2 text-sm text-mist-300">
+              Puoi eliminare qualsiasi materiale dalle pagine delle materie, sia delle lezioni sia d&apos;esame.
+            </p>
             <div className="mt-4 flex gap-2">
               <Link href="/corsi" className="btn-primary">
-                Vai agli insegnamenti
+                Vai alle materie
               </Link>
             </div>
           </div>

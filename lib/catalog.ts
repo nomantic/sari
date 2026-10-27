@@ -28,7 +28,7 @@ export function getCatalog() {
       slug: c.id,
       yearLabel:
         c.year === 0
-          ? "Insegnamenti a scelta"
+          ? "Materie a scelta"
           : c.year === 1
             ? "Primo anno"
             : c.year === 2

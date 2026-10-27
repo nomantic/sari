@@ -18,7 +18,7 @@ type Params = Promise<{ slug: string }>;
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
   const course = getCourse(slug);
-  if (!course) return { title: "Insegnamento non trovato" };
+  if (!course) return { title: "Materia non trovata" };
   return {
     title: course.name,
     description: `${course.name} (${course.professors.join(", ")}) — lezioni e materiali per data del corso SARI.`,
@@ -67,7 +67,7 @@ export default async function CoursePage({ params }: { params: Params }) {
         </Link>
         <span className="mx-2">/</span>
         <Link href="/corsi" className="hover:text-white">
-          Insegnamenti
+          Materie
         </Link>
         <span className="mx-2">/</span>
         <span className="text-mist-300">{course.short}</span>
@@ -126,7 +126,7 @@ export default async function CoursePage({ params }: { params: Params }) {
               </>
             ) : (
               <p className="mt-1 text-sm text-mist-300">
-                {course.sessions.length ? "Lezioni concluse per questo insegnamento." : "Orario non ancora pubblicato."}
+                {course.sessions.length ? "Lezioni concluse per questa materia." : "Orario non ancora pubblicato."}
               </p>
             )}
           </div>
@@ -196,7 +196,7 @@ export default async function CoursePage({ params }: { params: Params }) {
         {course.sessions.length === 0 ? (
           <div className="surface mt-4 p-8 text-center text-sm text-mist-400">
             {course.schedule.length === 0
-              ? "L'orario di questo insegnamento non è ancora stato pubblicato dal corso di studi."
+              ? "L'orario di questa materia non è ancora stato pubblicato dal corso di studi."
               : ACTIVE_SCOPE.emptyHint}
           </div>
         ) : (
@@ -219,7 +219,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
       {others.length > 0 && (
         <section className="mt-14">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-mist-400">Altri insegnamenti · {course.yearLabel}</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-mist-400">Altre materie · {course.yearLabel}</h2>
           <div className="mt-3 flex flex-wrap gap-2">
             {others.map((other) => (
               <Link key={other.id} href={`/corsi/${other.slug}`} className="btn-ghost text-xs">

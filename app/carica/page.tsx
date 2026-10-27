@@ -20,8 +20,9 @@ export default async function UploadPage() {
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Carica materiale</h1>
       <p className="mt-3 text-mist-300">
-        Scegli l&apos;insegnamento, poi la <strong className="text-white">data e l&apos;ora</strong> della lezione: il file finisce
-        esattamente nella lezione giusta, così tutti lo trovano subito.
+        Scegli la materia, poi la <strong className="text-white">data e l&apos;ora</strong> della lezione: il file finisce
+        esattamente nella lezione giusta, così tutti lo trovano subito. Se il materiale vale per tutta la materia (prove
+        passate, riassunti), scegli <strong className="text-white">Materiali d&apos;esame</strong>.
       </p>
 
       <div className="mt-8">

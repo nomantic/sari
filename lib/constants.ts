@@ -11,7 +11,7 @@ export const YEAR_LABELS: Record<number, string> = {
   1: "Primo anno",
   2: "Secondo anno",
   3: "Terzo anno",
-  0: "Insegnamenti a scelta",
+  0: "Materie a scelta",
 };
 
 export const CURRICULUM_LABELS: Record<string, { label: string; description: string }> = {
