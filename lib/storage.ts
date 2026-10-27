@@ -9,7 +9,13 @@ import type { FileRecord } from "./types";
  * full AWS SDK so the deployed bundle stays small.
  */
 
-const ENDPOINT = (process.env.R2_ENDPOINT ?? "https://d126d2072cbefe37feb7b2c948b83f63.r2.cloudflarestorage.com").replace(/\/+$/, "");
+/**
+ * The endpoint is configuration, not code: no account id is hardcoded here, so
+ * the repository carries no Cloudflare account identifier. Without
+ * R2_ENDPOINT the storage layer reports itself as unconfigured instead of
+ * silently pointing at someone else's bucket.
+ */
+const ENDPOINT = (process.env.R2_ENDPOINT ?? "").replace(/\/+$/, "");
 const BUCKET = process.env.R2_BUCKET ?? "sari";
 const REGION = process.env.R2_REGION ?? "auto";
 const MANIFEST_KEY = process.env.R2_MANIFEST_KEY ?? "sari-manifest.json";

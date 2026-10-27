@@ -47,7 +47,7 @@ console.log(`  bucket    ${bucket}`);
 console.log(`  key id    ${accessKeyId ? `${accessKeyId.slice(0, 6)}… (${accessKeyId.length} caratteri)` : "(manca R2_ACCESS_KEY_ID)"}`);
 console.log(`  secret    ${secretAccessKey ? `presente (${secretAccessKey.length} caratteri)` : "(manca R2_SECRET_ACCESS_KEY)"}`);
 
-if (!endpoint) fail("R2_ENDPOINT non impostato", "Copia da .env.example: R2_ENDPOINT=https://d126d2072cbefe37feb7b2c948b83f63.r2.cloudflarestorage.com");
+if (!endpoint) fail("R2_ENDPOINT non impostato", "Aggiungi a .env.local: R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com (lo trovi in Cloudflare → R2 → Overview).");
 if (!accessKeyId || !secretAccessKey) {
   fail(
     "mancano le chiavi API R2",

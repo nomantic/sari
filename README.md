@@ -202,7 +202,7 @@ la combinazione.
    Copiale subito: il secret non viene più mostrato.
 
 Se il bucket `sari` non compare, controlla di essere nell'account Cloudflare giusto:
-l'ID `d126d2072cbefe37feb7b2c948b83f63` appartiene a un account specifico.
+l'endpoint contiene un ID account, uguale per tutti i bucket di quell'account.
 
 Layout nel bucket:
 
@@ -224,7 +224,7 @@ sari/
 2. Copia `.env.example` in `.env.local` e compila:
 
 ```dotenv
-R2_ENDPOINT=https://d126d2072cbefe37feb7b2c948b83f63.r2.cloudflarestorage.com
+R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
 R2_BUCKET=sari
 R2_ACCESS_KEY_ID=...
 R2_SECRET_ACCESS_KEY=...
