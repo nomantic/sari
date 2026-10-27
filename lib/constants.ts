@@ -20,7 +20,13 @@ export const CURRICULUM_LABELS: Record<string, { label: string; description: str
   economico: { label: "Percorso economico", description: "Economia internazionale, Big Data, Economia Pubblica" },
 };
 
-export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024; // 50 MB per file
+/**
+ * 200 MB per file. Uploads go straight from the browser to R2 with a presigned
+ * PUT, so the file never passes through Vercel's function body limit — the
+ * only ceiling is what R2 accepts in a single PUT, and what the CORS policy
+ * allows. Downloads of large media stream via a presigned URL.
+ */
+export const MAX_UPLOAD_BYTES = 200 * 1024 * 1024;
 
 export const ALLOWED_EXTENSIONS = [
   "pdf", "doc", "docx", "ppt", "pptx", "odt", "odp", "rtf",

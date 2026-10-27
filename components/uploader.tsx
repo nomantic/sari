@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { notifyLocalStorageChange, useLocalStorageValue, writeLocalStorage } from "./use-local-storage";
+import { MAX_UPLOAD_BYTES } from "@/lib/constants";
 
 type Phase = "idle" | "checking" | "uploading" | "saving" | "done" | "error";
 
@@ -205,7 +206,7 @@ export function Uploader({ sessionId, sessionLabel, disabled, onUploaded }: Prop
           </button>
         </p>
         <p className="mt-1 text-[11px] text-mist-400">
-          PDF, Word, PowerPoint, Excel, immagini, audio/video, ZIP · massimo 50 MB per file
+          PDF, Word, PowerPoint, Excel, immagini, audio/video, ZIP · massimo {MAX_UPLOAD_BYTES / (1024 * 1024)} MB per file
         </p>
         <input
           ref={inputRef}

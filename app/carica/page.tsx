@@ -47,7 +47,7 @@ export default async function UploadPage() {
           <li>Chiunque può caricare e scaricare: il materiale è di tutti.</li>
           <li>Puoi rimuovere un file che hai caricato tu, dal dispositivo da cui l&apos;hai caricato.</li>
           <li>Non caricare materiale protetto da copyright o dati personali sensibili.</li>
-          <li>Massimo 50 MB per file.</li>
+          <li>Massimo 200 MB per file. Per file molto grandi (video), carica comunque qui: il trasferimento va diretto allo storage.</li>
         </ul>
       </div>
     </div>

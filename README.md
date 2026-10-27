@@ -256,7 +256,7 @@ mai nel bundle, nel repository o nel browser.
   nel manifest: il bucket non è utilizzabile come hosting anonimo di file.
 - `Content-Disposition: inline` per i documenti (i PDF si aprono nel browser), mai
   `text/html` — `X-Content-Type-Options: nosniff` su tutte le risposte.
-- Estensioni permesse dichiarate (`lib/constants.ts`), 50 MB per file, nome file
+- Estensioni permesse dichiarate (`lib/constants.ts`), 200 MB per file, nome file
   sanificato, chiavi validate con `isManagedKey()` prima di qualsiasi lettura o scrittura.
 - Il caricamento verifica che l'oggetto esista davvero su R2 (`HEAD`) prima di
   registrarlo, e usa la dimensione reale restituita dallo storage.
@@ -303,6 +303,12 @@ scripts/mock-r2.mjs              mock S3 per i test locali (non usato in produzi
   15 secondi. Semplice, senza database da gestire; sufficiente per la scala di un corso.
 - **Upload diretto**: il file non attraversa il server dell'app (nessun limite di payload
   Vercel); il browser carica diretto su R2 con URL presigned e barra di avanzamento reale.
+- **File grandi (fino a 200 MB)**: il limite è solo applicativo (`MAX_UPLOAD_BYTES`) e viene
+  verificato in due punti — prima di firmare l'URL e dopo, sulla dimensione reale dell'oggetto
+  su R2. Un video da 120 MB si carica in meno di un secondo contro R2. Richiede però che la
+  **CORS policy del bucket** accetti la richiesta: senza CORS il browser blocca il PUT, e con
+  file grandi il blocco arriva solo dopo aver letto tutto il file, quindi sembra un blocco.
+  Per i file multimediali il download usa un URL presigned (streaming diretto, non passa da Vercel).
 
 ---
 
