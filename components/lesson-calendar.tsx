@@ -66,8 +66,6 @@ export function LessonCalendar({
     const [y, m] = initial.split("-").map(Number);
     return { year: y, month: m - 1 };
   });
-  const [selected, setSelected] = useState<string | null>(null);
-
   // Group lessons by calendar date once; this is the calendar's whole index.
   const byDate = useMemo(() => {
     const map = new Map<string, Entry[]>();
@@ -109,14 +107,11 @@ export function LessonCalendar({
   function goToday() {
     const { year, monthIndex0 } = parts(today);
     setCursor({ year, month: monthIndex0 });
-    setSelected(today);
   }
-
-  const selectedEntries = selected ? (byDate.get(selected) ?? []) : [];
   const monthLessons = countsByMonth.get(isoOf(cursor.year, cursor.month, 1).slice(0, 7)) ?? 0;
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
+    <div className="grid gap-5">
       {/* ─────────── month grid ─────────── */}
       <div className="surface overflow-hidden">
         <div className="flex items-center justify-between gap-2 border-b border-white/8 px-3 py-2.5">
@@ -160,23 +155,17 @@ export function LessonCalendar({
             if (!cell) return <div key={`e-${index}`} className="min-h-16 bg-ink-900/40" />;
             const lessons = byDate.get(cell.date) ?? [];
             const isToday = cell.date === today;
-            const isSelected = cell.date === selected;
             const withFiles = lessons.filter((e) => e.files.length > 0).length;
 
             return (
-              <button
+              <Link
                 key={cell.date}
-                type="button"
-                onClick={() => setSelected(isSelected ? null : cell.date)}
-                aria-pressed={isSelected}
+                href={`/giorno/${cell.date}`}
                 aria-label={`${humanDate(cell.date)}: ${lessons.length} ${lessons.length === 1 ? "lezione" : "lezioni"}`}
+                title={`Apri le lezioni del ${humanDate(cell.date)}`}
                 className={`relative flex min-h-16 flex-col items-start gap-1 p-1.5 text-left transition-colors sm:min-h-20 ${
-                  isSelected
-                    ? "bg-brand-500/25 ring-2 ring-inset ring-brand-400"
-                    : isToday
-                      ? "bg-brand-500/10"
-                      : "bg-ink-900/60 hover:bg-white/6"
-                } ${lessons.length === 0 ? "cursor-default" : ""}`}
+                  isToday ? "bg-brand-500/10 hover:bg-brand-500/20" : "bg-ink-900/60 hover:bg-white/8"
+                }`}
               >
                 <span
                   className={`text-xs font-semibold tabular-nums ${
@@ -216,7 +205,7 @@ export function LessonCalendar({
                     title={`${withFiles} con materiali`}
                   />
                 )}
-              </button>
+              </Link>
             );
           })}
         </div>
@@ -228,103 +217,11 @@ export function LessonCalendar({
           <span className="inline-flex items-center gap-1">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> con materiali
           </span>
-          <span>Clicca un giorno per vedere le lezioni.</span>
+          <span>Clicca un giorno per aprire le lezioni di quella data.</span>
         </div>
       </div>
 
-      {/* ─────────── selected day ─────────── */}
-      <aside className="surface flex flex-col overflow-hidden" aria-live="polite">
-        {!selected ? (
-          <div className="p-6 text-center">
-            <p className="text-2xl" aria-hidden>
-              📅
-            </p>
-            <p className="mt-2 text-sm font-semibold text-white">Scegli un giorno</p>
-            <p className="mt-1 text-xs text-mist-400">
-              Clicca su un giorno del calendario per vedere le lezioni e aprire i materiali.
-            </p>
-            {byDate.has(today) && (
-              <button type="button" className="btn-ghost mt-4 text-xs" onClick={() => setSelected(today)}>
-                Mostra le lezioni di oggi
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            <div className="flex items-start justify-between gap-2 border-b border-white/8 px-3 py-2.5">
-              <div>
-                <p className="text-sm font-semibold text-white">{humanDate(selected)}</p>
-                <p className="text-[11px] text-mist-400">
-                  {selectedEntries.length} {selectedEntries.length === 1 ? "lezione" : "lezioni"}
-                </p>
-              </div>
-              <button
-                type="button"
-                className="rounded-lg px-2 py-1 text-[11px] text-mist-400 hover:text-white"
-                onClick={() => setSelected(null)}
-                aria-label="Chiudi il giorno selezionato"
-              >
-                ✕
-              </button>
-            </div>
-
-            {selectedEntries.length === 0 ? (
-              <p className="p-5 text-center text-xs text-mist-400">Nessuna lezione in questa data.</p>
-            ) : (
-              <ul className="divide-y divide-white/8">
-                {selectedEntries.map(({ session, files }) => (
-                  <li key={session.id} className="p-3">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className="rounded bg-white/8 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-white">
-                        {timeOf(session.start)}–{timeOf(session.end)}
-                      </span>
-                      {files.length > 0 ? (
-                        <span className="chip bg-emerald-500/15 text-emerald-300 ring-emerald-500/30">
-                          {files.length} material{files.length === 1 ? "e" : "i"}
-                        </span>
-                      ) : (
-                        <span className="chip bg-white/4 text-mist-400 ring-white/8">vuota</span>
-                      )}
-                    </div>
-                    <Link
-                      href={`/corsi/${session.courseSlug}#${session.id}`}
-                      className="mt-1.5 block text-sm font-medium text-white underline-offset-4 hover:underline"
-                    >
-                      {session.courseName}
-                    </Link>
-                    <p className="mt-0.5 text-[11px] text-mist-400">
-                      {session.professors.join(", ")} · {session.room}
-                    </p>
-                    {files.length > 0 && (
-                      <ul className="mt-1.5 space-y-0.5">
-                        {files.slice(0, 3).map((file) => (
-                          <li key={file.key}>
-                            <a
-                              href={`/api/files/download?key=${encodeURIComponent(file.key)}`}
-                              target="_blank"
-                              rel="noreferrer noopener"
-                              className="block truncate text-[11px] text-mist-300 underline-offset-2 hover:text-white hover:underline"
-                            >
-                              ↳ {file.name}
-                            </a>
-                          </li>
-                        ))}
-                        {files.length > 3 && (
-                          <li className="text-[11px] text-mist-400">
-                            <Link href={`/corsi/${session.courseSlug}#${session.id}`} className="hover:text-white">
-                              e altri {files.length - 3}…
-                            </Link>
-                          </li>
-                        )}
-                      </ul>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </>
-        )}
-      </aside>
+      
     </div>
   );
 }
