@@ -90,6 +90,19 @@ export interface FileRecord {
   uploadedBy?: string;
   note?: string;
   hidden?: boolean;
+  /**
+   * Usefulness votes. `up`/`down` are totals; `voters` maps a hash of the
+   * voter's browser id to their vote, which is what makes "one vote per
+   * browser" enforceable without accounts. Hashes only — no raw ids stored.
+   */
+  votes?: FileVotes;
+}
+
+export interface FileVotes {
+  up: number;
+  down: number;
+  /** voterHash → 1 (up) or -1 (down). */
+  voters: Record<string, 1 | -1>;
 }
 
 /** What a set of files hangs off: a single lesson, or a whole course for the exam. */

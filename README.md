@@ -76,6 +76,25 @@ funzionare, cosa che svuotare solo il cookie nel browser non garantirebbe.
 > prezzo per non avere account studenti. Per materiali delicati conviene che a eliminare sia
 > comunque un amministratore.
 
+### Voti di utilità (senza database)
+
+Ogni materiale ha 👍 / 👎 e un punteggio (voti utili meno voti poco utili). Serve a capire
+subito quali file valgono la pena: l'elenco dei materiali è **ordinato per punteggio**, i
+file senza voti restano in ordine alfabetico.
+
+I voti stanno nella voce del file dentro `sari-manifest.json` (`votes: { up, down, voters }`),
+quindi nessun database in più:
+
+- **un voto per browser**: il client genera un id casuale, salvato in `localStorage`, e lo
+  manda come header; il server conserva solo il suo **hash**, non l'id
+- premere di nuovo lo stesso pulsante **toglie** il voto; passare da 👍 a 👎 lo **sposta**
+  senza contare due volte
+- ricaricando la pagina il proprio voto resta evidenziato
+
+**Limite noto:** cancellando i dati del browser o aprendo una finestra privata si ottiene un
+id nuovo, quindi il meccanismo ferma il doppio clic e le manipolazioni casuali, non una
+persona determinata. Un voto davvero per persona richiede account (Supabase).
+
 ---
 
 ## Dati del corso
@@ -304,6 +323,7 @@ lib/
 ├── auth.ts                      login amministratore (sessione firmata)
 ├── admin.ts                     verifica sessione + revoca (epoch)
 ├── ownership.ts                 token di chi ha caricato un file
+├── votes.ts                     voti di utilità e ordinamento
 └── format.ts                    date Europe/Rome, validazione, dimensioni
 scripts/mock-r2.mjs              mock S3 per i test locali (non usato in produzione)
 ```

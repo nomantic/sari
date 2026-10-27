@@ -6,6 +6,8 @@ import { forgetDeletionToken, getDeletionToken } from "./uploader";
 import { useLocalStorageValue } from "./use-local-storage";
 import type { FileRecord } from "@/lib/types";
 import { fileTypeBadge, fileTypeTone, formatBytes } from "@/lib/format";
+import { sortByUsefulness, votesOf } from "@/lib/votes";
+import { VoteButtons } from "./vote-buttons";
 
 /**
  * Materials of one lesson or one subject. An admin may delete anything; anyone
@@ -71,13 +73,14 @@ export function FileList({
     <div className="space-y-2">
       {error && <p className="rounded-lg border border-red-500/30 bg-red-500/10 p-2 text-xs text-red-200">{error}</p>}
       <ul className="space-y-1.5">
-        {files.map((file) => {
+        {sortByUsefulness(files).map((file) => {
           const badge = fileTypeBadge(file);
           const tone = fileTypeTone[badge] ?? "bg-white/6 text-mist-300 ring-white/10";
+          const votes = votesOf(file);
           return (
             <li
               key={file.key}
-              className="group flex items-center gap-3 rounded-xl border border-white/8 bg-ink-950/40 px-3 py-2.5 transition-colors hover:border-white/16"
+              className="group flex items-start gap-3 rounded-xl border border-white/8 bg-ink-950/40 px-3 py-2.5 transition-colors hover:border-white/16"
             >
               <span className={`grid h-9 w-12 shrink-0 place-items-center rounded-lg text-[10px] font-bold ring-1 ring-inset ${tone}`}>
                 {badge}
@@ -97,6 +100,7 @@ export function FileList({
                   {file.uploadedBy ? ` · ${file.uploadedBy}` : ""}
                   {file.note ? ` · ${file.note}` : ""}
                 </p>
+                <VoteButtons fileKey={file.key} initialUp={votes.up} initialDown={votes.down} />
               </div>
               <a
                 href={`/api/files/download?key=${encodeURIComponent(file.key)}`}
