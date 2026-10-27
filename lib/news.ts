@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { isStorageConfigured, putObject, getObjectText } from "./storage";
 
 /**
@@ -134,7 +135,15 @@ export async function setPinned(id: string, pinned: boolean): Promise<NewsPost |
   });
 }
 
-/** Pinned notices stay at the top for everyone. */
+/**
+ * Token letting the browser that published a notice remove it again. Same idea
+ * as the uploader token for files, in its own domain so a file token cannot be
+ * replayed as a notice token.
+ */
+export function newsAuthorToken(id: string): string {
+  const secret = process.env.ADMIN_COOKIE_SECRET || process.env.ADMIN_PASSCODE || "sari-dev-secret";
+  return createHash("sha256").update(`news-author-v2:${id}:${secret}`).digest("hex").slice(0, 32);
+}
 
 export function validateNews(input: { title?: unknown; body?: unknown; author?: unknown }):
   | { ok: true; title: string; body: string; author: string }

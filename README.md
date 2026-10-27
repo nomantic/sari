@@ -32,7 +32,7 @@ Gli avvisi stanno in un unico oggetto JSON nel bucket, `sari/news.json`, letto c
   stesso istante non si sovrascrivono (verificato con un test di concorrenza);
 - limite di 20 avvisi/ora per client (`NEWS_RATE_LIMIT_PER_HOUR`), per non farsi sommergere;
 - limiti: 120 caratteri di titolo, 2000 di testo, massimo 500 avvisi conservati;
-- solo un amministratore può rimuovere gli avvisi (chi scrive non può cancellarli); può anche
+- chi li ha scritti può rimuoverli dal proprio dispositivo; l'amministratore può anche
   e fissare qualsiasi avviso;
 - il testo è sempre trattato come testo (niente HTML o script).
 **Limite noto:** senza database le scritture non sono transazionali tra istanze diverse di
@@ -59,15 +59,22 @@ fuori perimetro vengono rifiutate.
 
 - **Chiunque può caricare** materiali e pubblicare avvisi (senza registrazione).
 - **Chiunque può scaricare**.
-- **Solo gli amministratori eliminano.** Si accede da **`/admin`** con il codice
-  `ADMIN_PASSCODE`. Da lì si eliminano materiali di lezione, materiali d'esame e avvisi, e si
-  può fissare un avviso in cima.
-- Chi ha caricato un file **non** può rimuoverlo: pubblicare non dà alcun diritto.
-- Se `ADMIN_PASSCODE` non è impostato, **nessuna eliminazione è possibile**.
+- **Due modi di eliminare**:
+  - **l'autore**: chi ha caricato un file lo può rimuovere **dal browser e dal dispositivo**
+    in cui l'ha caricato, per 7 giorni (token legato al singolo file + cookie). Lo stesso vale
+    per un avviso scritto da te;
+  - **l'amministratore**: si accede da **`/admin`** con `ADMIN_PASSCODE` e si può eliminare
+    qualsiasi materiale e qualsiasi avviso, e fissare un avviso in cima.
+- Caricare da un altro browser o da un altro telefono **non** dà il diritto di cancellare.
+- Se `ADMIN_PASSCODE` non è impostata, resta solo l'eliminazione da parte di chi ha caricato.
 
 La sessione amministratore è un cookie `HttpOnly` firmato e dura 12 ore. Il logout revoca la
 sessione lato server (un "epoch" salvato nel bucket): anche una copia del cookie smette di
 funzionare, cosa che svuotare solo il cookie nel browser non garantirebbe.
+
+> Il token dell'autore è una credenziale "al portatore": chi lo intercetta può usarlo. È il
+> prezzo per non avere account studenti. Per materiali delicati conviene che a eliminare sia
+> comunque un amministratore.
 
 ---
 
@@ -281,6 +288,7 @@ app/
 ├── corsi/[slug]/page.tsx        lezioni di un insegnamento
 ├── carica/page.tsx              procedura guidata di caricamento
 ├── admin/page.tsx               accesso amministratore
+├── avvisi/page.tsx              bacheca avvisi
 └── api/
     ├── uploads/route.ts         presigned PUT (validazione)
     ├── uploads/complete/route.ts conferma + registrazione nel manifest
@@ -293,7 +301,9 @@ lib/
 ├── schedule.ts                  orario settimanale → lezioni datate
 ├── catalog.ts                   catalogo in memoria
 ├── storage.ts                   R2 (SigV4) + manifest + cache
-├── auth.ts / admin.ts           login e permessi di eliminazione
+├── auth.ts                      login amministratore (sessione firmata)
+├── admin.ts                     verifica sessione + revoca (epoch)
+├── ownership.ts                 token di chi ha caricato un file
 └── format.ts                    date Europe/Rome, validazione, dimensioni
 scripts/mock-r2.mjs              mock S3 per i test locali (non usato in produzione)
 ```

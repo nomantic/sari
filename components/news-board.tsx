@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useLocalStorageValue, writeLocalStorage } from "./use-local-storage";
+import { notifyLocalStorageChange, useLocalStorageValue, writeLocalStorage } from "./use-local-storage";
 import type { NewsPost } from "@/lib/news";
 
 const DATE_FMT = new Intl.DateTimeFormat("it-IT", {
@@ -35,7 +35,38 @@ function initials(name: string): string {
     .join("");
 }
 
-/** Anyone can publish; this form is the only thing a normal visitor sees. */
+const TOKEN_KEY = "sari-news-tokens";
+
+function readTokens(): Record<string, string> {
+  try {
+    return JSON.parse(window.localStorage.getItem(TOKEN_KEY) ?? "{}") as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+
+function saveToken(id: string, token: string) {
+  try {
+    const tokens = readTokens();
+    tokens[id] = token;
+    window.localStorage.setItem(TOKEN_KEY, JSON.stringify(tokens));
+    notifyLocalStorageChange();
+  } catch {
+    // private mode — removal will then need an admin
+  }
+}
+
+function dropToken(id: string) {
+  try {
+    const tokens = readTokens();
+    delete tokens[id];
+    window.localStorage.setItem(TOKEN_KEY, JSON.stringify(tokens));
+    notifyLocalStorageChange();
+  } catch {
+    // ignore
+  }
+}
+
 export function NewsComposer({ isAdmin }: { isAdmin: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -64,8 +95,11 @@ export function NewsComposer({ isAdmin }: { isAdmin: boolean }) {
       const data = (await res.json().catch(() => ({}))) as {
         error?: string;
         post?: { id: string };
+        token?: string;
       };
       if (!res.ok) throw new Error(data.error ?? "Pubblicazione non riuscita.");
+      // Keep the author token so this browser can remove its own notice.
+      if (data.post && data.token) saveToken(data.post.id, data.token);
 
       // Pinning is an admin action on an existing notice.
       if (pinned && isAdmin && data.post) {
@@ -177,7 +211,7 @@ export function NewsComposer({ isAdmin }: { isAdmin: boolean }) {
         </button>
       </div>
       <p className="text-[11px] text-mist-400">
-        Gli avvisi sono pubblici e visibili subito. Solo un amministratore può rimuoverli.
+        Gli avvisi sono pubblici e visibili subito. Puoi rimuovere un avviso che hai scritto tu, dal dispositivo con cui l&apos;hai scritto.
       </p>
     </form>
   );
@@ -189,6 +223,15 @@ export function NewsBoard({ posts, isAdmin }: { posts: NewsPost[]; isAdmin: bool
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Tokens for notices this browser wrote; re-renders when they change.
+  const tokenStore = useLocalStorageValue(TOKEN_KEY);
+  let myTokens: Record<string, string> = {};
+  try {
+    myTokens = tokenStore ? (JSON.parse(tokenStore) as Record<string, string>) : {};
+  } catch {
+    myTokens = {};
+  }
+
   async function remove(id: string) {
     setBusyId(id);
     setError(null);
@@ -196,10 +239,11 @@ export function NewsBoard({ posts, isAdmin }: { posts: NewsPost[]; isAdmin: bool
       const res = await fetch("/api/news", {
         method: "DELETE",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id, token: myTokens[id] }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Rimozione non riuscita.");
+      dropToken(id);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Errore inatteso.");
@@ -263,16 +307,18 @@ export function NewsBoard({ posts, isAdmin }: { posts: NewsPost[]; isAdmin: bool
             </div>
           </div>
 
-          {isAdmin && (
+          {(isAdmin || Boolean(myTokens[post.id])) && (
             <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/8 pt-2">
-              <button
-                type="button"
-                className="rounded-lg px-2 py-1 text-[11px] text-mist-400 hover:bg-white/8 hover:text-gold-400"
-                onClick={() => togglePin(post.id, !post.pinned)}
-                disabled={busyId === post.id}
-              >
-                {post.pinned ? "Togli da cima" : "Fissa in cima"}
-              </button>
+              {isAdmin && (
+                <button
+                  type="button"
+                  className="rounded-lg px-2 py-1 text-[11px] text-mist-400 hover:bg-white/8 hover:text-gold-400"
+                  onClick={() => togglePin(post.id, !post.pinned)}
+                  disabled={busyId === post.id}
+                >
+                  {post.pinned ? "Togli da cima" : "Fissa in cima"}
+                </button>
+              )}
               {confirmId === post.id ? (
                 <>
                   <button

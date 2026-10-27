@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useLocalStorageValue, writeLocalStorage } from "./use-local-storage";
+import { notifyLocalStorageChange, useLocalStorageValue, writeLocalStorage } from "./use-local-storage";
 import { MAX_UPLOAD_BYTES } from "@/lib/constants";
 
 type Phase = "idle" | "checking" | "uploading" | "saving" | "done" | "error";
@@ -21,7 +21,45 @@ interface Props {
   onUploaded?: () => void;
 }
 
-/** Uploads are open to everyone; deleting is reserved to admins (see /admin). */
+/** Uploads are open to everyone; removing a file is for its uploader or an admin. */
+
+const TOKEN_STORE_KEY = "sari-deletion-tokens";
+
+/** Remember the token that lets this browser remove its own upload later. */
+export function saveDeletionToken(key: string, token: string) {
+  try {
+    const raw = window.localStorage.getItem(TOKEN_STORE_KEY);
+    const parsed = raw ? (JSON.parse(raw) as Record<string, string>) : {};
+    parsed[key] = token;
+    window.localStorage.setItem(TOKEN_STORE_KEY, JSON.stringify(parsed));
+    notifyLocalStorageChange();
+  } catch {
+    // Private mode / quota: the uploader cookie still allows deletion.
+  }
+}
+
+export function getDeletionToken(key: string): string | null {
+  try {
+    const raw = window.localStorage.getItem(TOKEN_STORE_KEY);
+    if (!raw) return null;
+    return (JSON.parse(raw) as Record<string, string>)[key] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function forgetDeletionToken(key: string) {
+  try {
+    const raw = window.localStorage.getItem(TOKEN_STORE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw) as Record<string, string>;
+    delete parsed[key];
+    window.localStorage.setItem(TOKEN_STORE_KEY, JSON.stringify(parsed));
+    notifyLocalStorageChange();
+  } catch {
+    // ignore
+  }
+}
 
 function putWithProgress(url: string, file: File, contentType: string, onProgress: (pct: number) => void): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -110,8 +148,9 @@ export function Uploader({ sessionId, sessionLabel, disabled, onUploaded }: Prop
         note: note.trim() || undefined,
       }),
     });
-    const completed = (await completeRes.json().catch(() => ({}))) as { error?: string };
+    const completed = (await completeRes.json().catch(() => ({}))) as { error?: string; deletionToken?: string };
     if (!completeRes.ok) throw new Error(completed.error ?? "Impossibile registrare il file.");
+    if (completed.deletionToken) saveDeletionToken(prepared.key, completed.deletionToken);
   }
 
   async function start() {

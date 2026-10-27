@@ -1,32 +1,26 @@
 import { NextResponse } from "next/server";
-import { isAdminRequest } from "@/lib/admin";
 import { isManagedKey } from "@/lib/format";
 import { deleteObject, invalidateFilesCache, isStorageConfigured, readManifest, writeManifest } from "@/lib/storage";
+import { canDeleteKey } from "@/lib/ownership";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 interface Body {
   key?: string;
+  token?: string;
   reason?: string;
 }
 
 /**
- * Removing a material is admin-only. Uploading and downloading are open to
- * everyone; nothing about having uploaded a file grants the right to delete it.
+ * Deleting a material is allowed for:
+ *  - an admin session from `/admin` (anything), and
+ *  - the browser that uploaded that specific file (token + cookie, 7 days).
+ * Everyone else gets 403, enforced server-side.
  */
 export async function POST(request: Request) {
   if (!isStorageConfigured()) {
     return NextResponse.json({ error: "Object storage non configurato." }, { status: 503 });
-  }
-  if (!(await isAdminRequest())) {
-    return NextResponse.json(
-      {
-        error: "Solo un amministratore può eliminare i materiali. Accedi da /admin.",
-        code: "FORBIDDEN",
-      },
-      { status: 403 },
-    );
   }
 
   let body: Body;
@@ -39,14 +33,31 @@ export async function POST(request: Request) {
   const key = String(body.key ?? "");
   if (!isManagedKey(key)) return NextResponse.json({ error: "Chiave non valida." }, { status: 400 });
 
+  const role = await canDeleteKey(key, body.token);
+  if (role === "none") {
+    return NextResponse.json(
+      {
+        error:
+          "Puoi eliminare solo i materiali che hai caricato tu, dal dispositivo con cui li hai caricati. Per gli altri serve un amministratore (/admin).",
+        code: "FORBIDDEN",
+      },
+      { status: 403 },
+    );
+  }
+
   const manifest = await readManifest();
   const entry = manifest.files.find((f) => f.key === key);
   if (!entry || entry.hidden) return NextResponse.json({ error: "File non presente nell'indice." }, { status: 404 });
 
-  // Delete the object first, then drop it from the index.
-  await deleteObject(key);
-  await writeManifest(manifest.files.filter((f) => f.key !== key));
+  if (role === "admin") {
+    // Hard delete: remove the object and its index entry.
+    await deleteObject(key);
+    await writeManifest(manifest.files.filter((f) => f.key !== key));
+  } else {
+    // Uploader: soft delete, so a mistaken removal is recoverable by an admin.
+    await writeManifest(manifest.files.map((f) => (f.key === key ? { ...f, hidden: true } : f)));
+  }
   invalidateFilesCache();
 
-  return NextResponse.json({ ok: true, removed: entry.name, reason: body.reason ?? null });
+  return NextResponse.json({ ok: true, removed: entry.name, by: role });
 }

@@ -16,11 +16,40 @@ export const ADMIN_COOKIE = "sari_admin";
 export const ADMIN_SESSION_HOURS = 12;
 
 /** Minimum length for the passcode in the environment. */
-const MIN_PASSCODE = 8;
+const MIN_PASSCODE = 4;
+
+/**
+ * Read the configured passcode defensively: pasting into a dashboard field very
+ * often brings a trailing newline or stray quotes, and a passcode that "doesn't
+ * work" is indistinguishable from one that was never read.
+ */
+function configuredPasscode(): string {
+  const raw = process.env.ADMIN_PASSCODE;
+  if (!raw) return "";
+  return raw
+    .trim()
+    .replace(/^["']|["']$/g, "")
+    .trim();
+}
 
 export function adminConfigured(): boolean {
-  const passcode = process.env.ADMIN_PASSCODE;
-  return Boolean(passcode && passcode.length >= MIN_PASSCODE);
+  return configuredPasscode().length >= MIN_PASSCODE;
+}
+
+/** Diagnostic only: tells the operator *why* the passcode was rejected. */
+export function adminConfigProblem(): string | null {
+  const raw = process.env.ADMIN_PASSCODE;
+  if (raw === undefined) {
+    return "ADMIN_PASSCODE non è impostata per questo ambiente (Production/Preview) su Vercel.";
+  }
+  const value = configuredPasscode();
+  if (value.length === 0) {
+    return "ADMIN_PASSCODE è impostata ma vuota.";
+  }
+  if (value.length < MIN_PASSCODE) {
+    return `ADMIN_PASSCODE è troppo corta (${value.length} caratteri, minimo ${MIN_PASSCODE}).`;
+  }
+  return null;
 }
 
 function digest(value: string): Buffer {
@@ -35,7 +64,7 @@ export function safeEqual(a: string, b: string): boolean {
 function sessionSecret(): string {
   // A dedicated secret is best; falling back to the passcode keeps a fresh
   // deployment working with a single variable, without weakening either.
-  return process.env.ADMIN_COOKIE_SECRET || process.env.ADMIN_PASSCODE || "";
+  return (process.env.ADMIN_COOKIE_SECRET ?? "").trim() || configuredPasscode();
 }
 
 /**
@@ -54,9 +83,9 @@ export function adminCookieValue(epoch = 0): string {
 }
 
 export function checkAdminPasscode(candidate: string): boolean {
-  const expected = process.env.ADMIN_PASSCODE;
-  if (!expected || expected.length < MIN_PASSCODE || !candidate) return false;
-  return safeEqual(candidate, expected);
+  const expected = configuredPasscode();
+  if (expected.length < MIN_PASSCODE || !candidate) return false;
+  return safeEqual(candidate.trim(), expected);
 }
 
 /** Value that any cookie signed with an epoch other than `current` is rejected. */

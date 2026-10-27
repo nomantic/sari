@@ -11,6 +11,8 @@ import {
   writeManifest,
 } from "@/lib/storage";
 import type { FileRecord } from "@/lib/types";
+import { rememberUploader, uploaderToken } from "@/lib/ownership";
+import { isHttpsRequest } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -84,7 +86,9 @@ export async function POST(request: Request) {
   };
 
   await writeManifest([...manifest.files, record]);
+  // Remember this browser as the uploader so it can undo its own upload.
+  await rememberUploader(key, isHttpsRequest(request));
 
-  return NextResponse.json({ ok: true, record });
+  return NextResponse.json({ ok: true, record, deletionToken: uploaderToken(key) });
 }
 

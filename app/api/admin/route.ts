@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import {
   ADMIN_COOKIE,
   ADMIN_SESSION_HOURS,
+  adminConfigProblem,
   adminConfigured,
   adminCookieValue,
   checkAdminPasscode,
@@ -23,8 +24,8 @@ export async function POST(request: Request) {
   if (!adminConfigured()) {
     return NextResponse.json(
       {
-        error:
-          "Nessun amministratore configurato: imposta ADMIN_PASSCODE (almeno 8 caratteri) nelle variabili d'ambiente e rideploya.",
+        error: adminConfigProblem() ?? "ADMIN_PASSCODE non valida.",
+        code: "ADMIN_NOT_CONFIGURED",
       },
       { status: 503 },
     );

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AdminLogin, AdminSessionCard } from "@/components/admin-login";
 import { isAdminRequest } from "@/lib/admin";
-import { adminConfigured } from "@/lib/auth";
+import { adminConfigProblem, adminConfigured } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -38,9 +38,13 @@ export default async function AdminPage() {
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
             <p className="font-semibold">Nessun amministratore configurato</p>
             <p className="mt-1 text-amber-200/90">
-              Imposta la variabile d&apos;ambiente{" "}
-              <code className="rounded bg-black/30 px-1">ADMIN_PASSCODE</code> (almeno 8 caratteri) su Vercel e rideploya.
-              Finché non è configurata, nessuno può eliminare contenuti.
+              {adminConfigProblem() ?? "ADMIN_PASSCODE non valida."}
+            </p>
+            <p className="mt-2 text-amber-200/80">
+              Su Vercel: Settings → Environment Variables → aggiungi{" "}
+              <code className="rounded bg-black/30 px-1">ADMIN_PASSCODE</code> per{" "}
+              <strong>Production</strong>, poi <strong>Redeploy</strong>. Le variabili non entrano in vigore su un
+              deployment già esistente.
             </p>
           </div>
         )}

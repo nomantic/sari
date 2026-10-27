@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { isAdminRequest } from "@/lib/admin";
-import { addNews, deleteNews, listNews, setPinned, validateNews } from "@/lib/news";
+import { addNews, deleteNews, listNews, newsAuthorToken, setPinned, validateNews } from "@/lib/news";
 import { isStorageConfigured } from "@/lib/storage";
+import { safeEqual } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
   }
 
   const post = await addNews({ title: parsed.title, body: parsed.body, author: parsed.author });
-  return NextResponse.json({ ok: true, post });
+  return NextResponse.json({ ok: true, post, token: newsAuthorToken(post.id) });
 }
 
 interface PatchBody {
@@ -116,17 +117,15 @@ export async function PATCH(request: Request) {
 
 interface DeleteBody {
   id?: string;
+  token?: string;
 }
 
-/** Removal — admin only. Publishing a notice does not let you remove it. */
+/**
+ * Removal: an admin may delete any notice; the browser that published one may
+ * delete that notice again (author token, or the same token via the composer).
+ */
 export async function DELETE(request: Request) {
   if (!isStorageConfigured()) return notConfigured();
-  if (!(await isAdminRequest())) {
-    return NextResponse.json(
-      { error: "Solo un amministratore può eliminare gli avvisi.", code: "FORBIDDEN" },
-      { status: 403 },
-    );
-  }
 
   let payload: DeleteBody;
   try {
@@ -138,7 +137,21 @@ export async function DELETE(request: Request) {
   const id = String(payload.id ?? "");
   if (!ID_RE.test(id)) return badId();
 
+  const isAdmin = await isAdminRequest();
+  const isAuthor =
+    Boolean(payload.token) && safeEqual(String(payload.token), newsAuthorToken(id));
+
+  if (!isAdmin && !isAuthor) {
+    return NextResponse.json(
+      {
+        error: "Puoi eliminare solo gli avvisi che hai pubblicato tu, dal dispositivo con cui li hai scritti.",
+        code: "FORBIDDEN",
+      },
+      { status: 403 },
+    );
+  }
+
   const removed = await deleteNews(id);
   if (!removed) return NextResponse.json({ error: "Avviso non trovato." }, { status: 404 });
-  return NextResponse.json({ ok: true, removed: removed.title });
+  return NextResponse.json({ ok: true, removed: removed.title, by: isAdmin ? "admin" : "author" });
 }

@@ -1,14 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { forgetDeletionToken, getDeletionToken } from "./uploader";
+import { useLocalStorageValue } from "./use-local-storage";
 import type { FileRecord } from "@/lib/types";
 import { fileTypeBadge, fileTypeTone, formatBytes } from "@/lib/format";
 
 /**
- * Materials of one lesson or one subject. Deleting is admin-only, so the
- * "Rimuovi" control is rendered only for an admin session — and the API checks
- * the same thing server-side, so hiding it is convenience, not security.
+ * Materials of one lesson or one subject. An admin may delete anything; anyone
+ * else only sees "Elimina" on files this browser uploaded. The API enforces the
+ * same rule, so hiding the button is convenience, not security.
  */
 export function FileList({
   files,
@@ -24,6 +26,18 @@ export function FileList({
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Tokens live in localStorage; the hook re-renders when they change.
+  const tokenStore = useLocalStorageValue("sari-deletion-tokens");
+  const ownKeys = useMemo(() => {
+    let tokens: Record<string, string> = {};
+    try {
+      tokens = tokenStore ? (JSON.parse(tokenStore) as Record<string, string>) : {};
+    } catch {
+      tokens = {};
+    }
+    return new Set(files.filter((file) => typeof tokens[file.key] === "string").map((file) => file.key));
+  }, [files, tokenStore]);
+
   async function remove(file: FileRecord) {
     setBusyKey(file.key);
     setError(null);
@@ -31,10 +45,11 @@ export function FileList({
       const res = await fetch("/api/files/delete", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ key: file.key }),
+        body: JSON.stringify({ key: file.key, token: getDeletionToken(file.key) }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Eliminazione non riuscita.");
+      forgetDeletionToken(file.key);
       setConfirmKey(null);
       router.refresh();
     } catch (err) {
@@ -92,7 +107,7 @@ export function FileList({
               >
                 Apri
               </a>
-              {isAdmin &&
+              {(isAdmin || ownKeys.has(file.key)) &&
                 (confirmKey === file.key ? (
                   <div className="flex shrink-0 items-center gap-1">
                     <button
