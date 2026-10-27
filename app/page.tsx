@@ -69,6 +69,47 @@ export default async function HomePage() {
           </Link>
         </div>
 
+        {latestNews.length > 0 && (
+          <section aria-labelledby="avvisi-home" className="mt-8">
+            <div className="rounded-2xl border border-gold-400/25 bg-gradient-to-br from-gold-400/10 via-ink-900/70 to-ink-900/70 p-4 sm:p-5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 id="avvisi-home" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gold-400">
+                  <span aria-hidden>📣</span> Avvisi
+                </h2>
+                <Link href="/avvisi" className="text-xs font-medium text-gold-400 underline-offset-4 hover:underline">
+                  tutti gli avvisi →
+                </Link>
+              </div>
+
+              <ul className="mt-3 space-y-2">
+                {latestNews.slice(0, 3).map((post, index) => (
+                  <li key={post.id}>
+                    <Link
+                      href="/avvisi"
+                      className={`flex items-start gap-3 rounded-xl border px-3 py-2.5 transition-colors hover:border-gold-400/50 hover:bg-gold-400/5 ${
+                        index === 0 ? "border-gold-400/30 bg-ink-950/50" : "border-white/8 bg-ink-950/30"
+                      }`}
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="flex flex-wrap items-center gap-2">
+                          {post.pinned && <span className="chip bg-gold-400/20 text-gold-400 ring-gold-400/40">📌 Fissato</span>}
+                          <span className="text-sm font-semibold text-white">{post.title}</span>
+                        </span>
+                        <span className="mt-0.5 block truncate text-xs text-mist-300">{post.body}</span>
+                      </span>
+                      <span className="shrink-0 text-right text-[11px] text-mist-400">{post.author}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              <Link href="/avvisi" className="mt-3 inline-block text-xs text-mist-300 underline-offset-4 hover:text-white hover:underline">
+                Scrivi anche tu un avviso →
+              </Link>
+            </div>
+          </section>
+        )}
+
         <dl className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {[
             { label: "Materie", value: courses.length },
@@ -104,31 +145,6 @@ export default async function HomePage() {
                 Verifica con <code className="rounded bg-black/30 px-1">npm run check:r2</code> e riavvia il server.
               </li>
             </ol>
-          </div>
-        )}
-
-        {latestNews.length > 0 && (
-          <div className="mt-6 rounded-xl border border-white/8 bg-ink-900/50 p-4">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-mist-400">Ultimi avvisi</p>
-              <Link href="/avvisi" className="text-xs text-mist-400 underline-offset-4 hover:text-white hover:underline">
-                tutti gli avvisi →
-              </Link>
-            </div>
-            <ul className="mt-2 space-y-1.5">
-              {latestNews.slice(0, 3).map((post) => (
-                <li key={post.id}>
-                  <Link
-                    href="/avvisi"
-                    className="flex items-baseline gap-2 rounded-lg border border-white/8 bg-ink-950/40 px-3 py-2 transition-colors hover:border-brand-400/40"
-                  >
-                    {post.pinned && <span aria-label="Fissato">📌</span>}
-                    <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">{post.title}</span>
-                    <span className="shrink-0 text-[11px] text-mist-400">{post.author}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
           </div>
         )}
 

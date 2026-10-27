@@ -27,23 +27,19 @@ function monthHeading(isoDate: string): string {
 }
 
 export function LessonFeed({ entries, uploadsEnabled, today, yearLabels }: Props) {
-  const [query, setQuery] = useState("");
   const [year, setYear] = useState<string>("all");
   const [showPast, setShowPast] = useState(false);
   const [onlyWithFiles, setOnlyWithFiles] = useState(false);
   const [limit, setLimit] = useState(40);
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
     return entries.filter(({ session, files }) => {
       if (!showPast && session.date < today) return false;
       if (year !== "all" && String(session.year) !== year) return false;
       if (onlyWithFiles && files.length === 0) return false;
-      if (!q) return true;
-      const haystack = `${session.courseName} ${session.courseShort} ${session.professors.join(" ")} ${session.room} ${session.date}`.toLowerCase();
-      return haystack.includes(q);
+      return true;
     });
-  }, [entries, query, year, showPast, onlyWithFiles, today]);
+  }, [entries, year, showPast, onlyWithFiles, today]);
 
   const visible = filtered.slice(0, limit);
   const grouped = useMemo(() => {
@@ -70,26 +66,18 @@ export function LessonFeed({ entries, uploadsEnabled, today, yearLabels }: Props
   return (
     <div className="space-y-6">
       <div className="surface sticky top-16 z-30 -mx-1 p-3 backdrop-blur-xl">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-mist-400" aria-hidden>
-              ⌕
-            </span>
-            <input
-              type="search"
-              className="input pl-9"
-              placeholder="Cerca materia, docente, aula…"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setLimit(40);
-              }}
-              aria-label="Cerca lezioni"
-            />
-          </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-mist-300">
+          <label className="inline-flex items-center gap-1.5">
+            <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
+            Mostra anche le lezioni passate
+          </label>
+          <label className="inline-flex items-center gap-1.5">
+            <input type="checkbox" checked={onlyWithFiles} onChange={(e) => setOnlyWithFiles(e.target.checked)} />
+            Solo con materiali
+          </label>
           {availableYears.length > 1 && (
             <select
-              className="input sm:w-52"
+              className="rounded-lg border border-white/10 bg-ink-950/60 px-2 py-1 text-xs text-mist-200"
               value={year}
               onChange={(e) => setYear(e.target.value)}
               aria-label="Filtra per anno"
@@ -102,16 +90,6 @@ export function LessonFeed({ entries, uploadsEnabled, today, yearLabels }: Props
               ))}
             </select>
           )}
-        </div>
-        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-mist-300">
-          <label className="inline-flex items-center gap-1.5">
-            <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
-            Mostra anche le lezioni passate
-          </label>
-          <label className="inline-flex items-center gap-1.5">
-            <input type="checkbox" checked={onlyWithFiles} onChange={(e) => setOnlyWithFiles(e.target.checked)} />
-            Solo con materiali
-          </label>
           <span className="ml-auto tabular-nums text-mist-400">
             {filtered.length} {filtered.length === 1 ? "lezione" : "lezioni"}
           </span>
