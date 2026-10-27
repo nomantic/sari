@@ -55,6 +55,22 @@ I due contenitori restano distinti anche nello storage e nelle API: non è possi
 caricare un file d'esame dentro una lezione (o viceversa), e le chiavi di un insegnamento
 fuori perimetro vengono rifiutate.
 
+### Tema chiaro e scuro
+
+L'icona ☀/☾ nella barra di navigazione cambia tema; la scelta è salvata nel browser e,
+alla prima visita, si segue l'impostazione del sistema operativo. Il tema viene applicato
+**prima del primo disegno** da un piccolo script inline, quindi non c'è il lampo bianco
+tipico di chi applica il tema dopo il caricamento.
+
+Tutta l'interfaccia usa nomi di colore semantici (`surface`, `strong`, `muted`, `line`,
+`brand`, `up`/`down`), definiti due volte in [`app/globals.css`](app/globals.css) sotto
+`html[data-theme="dark"]` e `html[data-theme="light"]`. Per ritoccare un tema basta
+cambiare quelle variabili: nessun componente contiene colori scritti a mano.
+
+Il logotipo **SARI** è tipografico: un carattere display serif (Cormorant Garamond,
+caricato e servito da Next, nessuna richiesta a Google a runtime) con una linea sottile e il
+nome esteso del corso sotto.
+
 ### Permessi
 
 - **Chiunque può caricare** materiali e pubblicare avvisi (senza registrazione).

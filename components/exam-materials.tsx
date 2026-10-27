@@ -37,7 +37,7 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 id="materiali-esame-title" className="text-base font-semibold text-white">
+            <h2 id="materiali-esame-title" className="text-base font-semibold text-strong">
               Materiali d&apos;esame
             </h2>
             <span className="chip bg-gold-400/15 text-gold-400 ring-gold-400/30">Per tutta la materia</span>
@@ -47,8 +47,8 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
               </span>
             )}
           </div>
-          <p className="mt-1.5 max-w-2xl text-sm text-mist-300">
-            Tutto ciò che serve per l&apos;esame di <strong className="text-white">{courseName}</strong>: slide complete,
+          <p className="mt-1.5 max-w-2xl text-sm text-muted">
+            Tutto ciò che serve per l&apos;esame di <strong className="text-strong">{courseName}</strong>: slide complete,
             riassunti, prove d&apos;esame passate, domande frequenti. Non legato a una singola lezione.
           </p>
 
@@ -56,8 +56,8 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
             <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
               {stats.map((stat) => (
                 <div key={stat.label}>
-                  <dt className="text-[10px] uppercase tracking-wider text-mist-400">{stat.label}</dt>
-                  <dd className="text-sm font-semibold tabular-nums text-white">{stat.value}</dd>
+                  <dt className="text-[10px] uppercase tracking-wider text-faint">{stat.label}</dt>
+                  <dd className="text-sm font-semibold tabular-nums text-strong">{stat.value}</dd>
                 </div>
               ))}
             </dl>
@@ -65,9 +65,9 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
         </div>
       </div>
 
-      <div className="grid gap-5 border-t border-white/8 bg-ink-950/30 p-5 lg:grid-cols-[1fr_320px]">
+      <div className="grid gap-5 border-t border-line bg-surface-2 p-5 lg:grid-cols-[1fr_320px]">
         <section aria-label="File per l'esame" className="order-2 lg:order-1">
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-mist-400">
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
             File disponibili ({files.length})
           </h3>
           <FileList
@@ -77,7 +77,7 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
           />
         </section>
         <section aria-labelledby="carica-esame" className="order-1 lg:order-2">
-          <h3 id="carica-esame" className="mb-2 text-xs font-semibold uppercase tracking-wider text-mist-400">
+          <h3 id="carica-esame" className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
             Carica per l&apos;esame
           </h3>
           <Uploader

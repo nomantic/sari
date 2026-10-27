@@ -71,12 +71,12 @@ export default async function DayPage({ params }: { params: Params }) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <nav aria-label="Percorso" className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-mist-400">
-        <Link href="/calendario" className="hover:text-white">
+      <nav aria-label="Percorso" className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-faint">
+        <Link href="/calendario" className="hover:text-strong">
           Calendario
         </Link>
         <span>/</span>
-        <span className="text-mist-300">{humanDate(date)}</span>
+        <span className="text-muted">{humanDate(date)}</span>
       </nav>
 
       <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
@@ -85,7 +85,7 @@ export default async function DayPage({ params }: { params: Params }) {
             {lessons.length} {lessons.length === 1 ? "lezione" : "lezioni"}
             {filesTotal > 0 ? ` · ${filesTotal} material${filesTotal === 1 ? "e" : "i"}` : ""}
           </p>
-          <h1 className="mt-2 text-3xl font-bold capitalize tracking-tight text-white sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-bold capitalize tracking-tight text-strong sm:text-4xl">
             {humanDate(date)}
           </h1>
           {date === today && (
@@ -119,8 +119,8 @@ export default async function DayPage({ params }: { params: Params }) {
           <p className="text-3xl" aria-hidden>
             🗓️
           </p>
-          <p className="mt-2 text-sm font-semibold text-white">Nessuna lezione in questa data</p>
-          <p className="mt-1 text-xs text-mist-400">
+          <p className="mt-2 text-sm font-semibold text-strong">Nessuna lezione in questa data</p>
+          <p className="mt-1 text-xs text-faint">
             In questo giorno del calendario non ci sono lezioni del periodo attivo.
           </p>
           <div className="mt-4 flex justify-center gap-2">

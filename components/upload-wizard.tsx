@@ -66,19 +66,19 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
           <li key={step.n} className="flex items-center gap-2">
             <span
               className={`grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold ${
-                step.done ? "bg-emerald-500 text-white" : "border border-white/15 bg-ink-900 text-mist-300"
+                step.done ? "bg-emerald-500 text-strong" : "border border-line-strong bg-surface text-muted"
               }`}
             >
               {step.done ? "✓" : step.n}
             </span>
-            <span className={step.done ? "text-white" : "text-mist-400"}>{step.label}</span>
+            <span className={step.done ? "text-strong" : "text-faint"}>{step.label}</span>
             {step.n < 3 && <span className="mx-1 h-px w-6 bg-white/15" aria-hidden />}
           </li>
         ))}
       </ol>
 
       <section className="surface p-4">
-        <h2 className="text-sm font-semibold text-white">1 · Quale materia?</h2>
+        <h2 className="text-sm font-semibold text-strong">1 · Quale materia?</h2>
         <input
           type="search"
           className="input mt-2"
@@ -105,11 +105,11 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
                 className={`block w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
                   courseId === c.id
                     ? "border-brand-400/60 bg-brand-500/15"
-                    : "border-white/8 bg-ink-950/40 hover:border-white/16 hover:bg-white/5"
+                    : "border-line bg-surface-2 hover:border-line-strong hover:bg-surface-2"
                 }`}
               >
-                <span className="block text-sm font-medium text-white">{c.name}</span>
-                <span className="mt-0.5 block text-[11px] text-mist-400">
+                <span className="block text-sm font-medium text-strong">{c.name}</span>
+                <span className="mt-0.5 block text-[11px] text-faint">
                   {yearLabels[c.year]} · {c.professors.join(", ")} · {c.sessions.length} lezioni
                 </span>
               </button>
@@ -120,8 +120,8 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
       {course && (
         <section className="surface p-4">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-white">2 · Quale lezione?</h2>
-            <label className="inline-flex items-center gap-1.5 text-[11px] text-mist-300">
+            <h2 className="text-sm font-semibold text-strong">2 · Quale lezione?</h2>
+            <label className="inline-flex items-center gap-1.5 text-[11px] text-muted">
               <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
               includi lezioni passate
             </label>
@@ -141,7 +141,7 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
             ))}
           </select>
           {sessionOptions.length === 0 && (
-            <p className="mt-2 text-xs text-mist-400">
+            <p className="mt-2 text-xs text-faint">
               Nessuna lezione futura per questa materia. Attiva «includi lezioni passate» per caricare materiali di una
               lezione già svolta.
             </p>
@@ -149,12 +149,12 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
           {session && (
             <div className="mt-3 rounded-xl border border-brand-400/30 bg-brand-500/10 px-3 py-2 text-xs text-brand-200">
               Stai caricando materiali per la lezione del{" "}
-              <strong className="text-white">{label(session)}</strong> ({session.room}).
+              <strong className="text-strong">{label(session)}</strong> ({session.room}).
             </div>
           )}
           {isExam && (
             <div className="mt-3 rounded-xl border border-gold-400/30 bg-gold-400/10 px-3 py-2 text-xs text-gold-400">
-              Stai caricando <strong className="text-white">materiali d&apos;esame</strong> per tutta la materia: slide
+              Stai caricando <strong className="text-strong">materiali d&apos;esame</strong> per tutta la materia: slide
               complete, riassunti, prove passate.
             </div>
           )}
@@ -162,12 +162,12 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
       )}
 
       <section className="surface p-4">
-        <h2 className="text-sm font-semibold text-white">3 · Carica i file</h2>
+        <h2 className="text-sm font-semibold text-strong">3 · Carica i file</h2>
         <div className="mt-3">
           {sessionId && targetLabel ? (
             <Uploader sessionId={sessionId} sessionLabel={targetLabel} disabled={!uploadsEnabled} onUploaded={onUploaded} />
           ) : (
-            <p className="rounded-xl border border-dashed border-white/10 px-3 py-6 text-center text-xs text-mist-400">
+            <p className="rounded-xl border border-dashed border-line px-3 py-6 text-center text-xs text-faint">
               Scegli prima la materia e la destinazione (lezione o materiali d&apos;esame).
             </p>
           )}

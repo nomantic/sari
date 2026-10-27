@@ -44,18 +44,18 @@ export function LessonCard({ session, files, isPast, isToday, dense }: Props) {
       {!dense && (
         <span
           className={`flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl border text-center ${
-            isToday ? "border-brand-400/40 bg-brand-500/15" : "border-white/10 bg-ink-950/60"
+            isToday ? "border-brand-400/40 bg-brand-500/15" : "border-line bg-surface-2"
           }`}
         >
-          <span className="text-base font-bold leading-none text-white">{day}</span>
-          <span className="mt-0.5 text-[10px] uppercase tracking-wider text-mist-400">{month}</span>
-          <span className="text-[10px] uppercase tracking-wider text-mist-400">{weekday}</span>
+          <span className="text-base font-bold leading-none text-strong">{day}</span>
+          <span className="mt-0.5 text-[10px] uppercase tracking-wider text-faint">{month}</span>
+          <span className="text-[10px] uppercase tracking-wider text-faint">{weekday}</span>
         </span>
       )}
 
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-1.5">
-          <span className="rounded-md bg-white/8 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-white">
+          <span className="rounded-md bg-surface-3 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-strong">
             {timeOf(session.start)}–{timeOf(session.end)}
           </span>
           {session.label && (
@@ -67,20 +67,20 @@ export function LessonCard({ session, files, isPast, isToday, dense }: Props) {
               {files.length} {files.length === 1 ? "materiale" : "materiali"}
             </span>
           ) : (
-            <span className="chip bg-white/4 text-mist-400 ring-white/8">nessun materiale</span>
+            <span className="chip bg-surface-2 text-faint ring-line">nessun materiale</span>
           )}
         </span>
 
-        <span className="mt-1 block truncate text-sm font-semibold text-white group-hover:underline group-hover:underline-offset-4">
+        <span className="mt-1 block truncate text-sm font-semibold text-strong group-hover:underline group-hover:underline-offset-4">
           {session.courseName}
         </span>
-        <span className="mt-0.5 block truncate text-[11px] text-mist-400">
+        <span className="mt-0.5 block truncate text-[11px] text-faint">
           {session.professors.join(", ")} · {session.room}
           {isPast ? "" : ""}
         </span>
       </span>
 
-      <span className="shrink-0 text-mist-400 transition-colors group-hover:text-white" aria-hidden>
+      <span className="shrink-0 text-faint transition-colors group-hover:text-strong" aria-hidden>
         →
       </span>
     </Link>

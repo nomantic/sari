@@ -129,7 +129,7 @@ export function NavSearch({ compact = false }: { compact?: boolean }) {
         Cerca nel sito
       </label>
       <div className="relative">
-        <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-mist-400 sm:left-3" aria-hidden>
+        <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-faint sm:left-3" aria-hidden>
           ⌕
         </span>
         <input
@@ -141,7 +141,7 @@ export function NavSearch({ compact = false }: { compact?: boolean }) {
           aria-controls={listId}
           aria-autocomplete="list"
           autoComplete="off"
-          className="h-10 w-full rounded-xl border border-white/10 bg-ink-950/70 pl-8 pr-2 text-sm text-white placeholder:text-mist-400/70 focus:border-brand-400/60 focus:outline-none sm:pl-9 sm:pr-3"
+          className="h-10 w-full rounded-xl border border-line bg-surface-2 pl-8 pr-2 text-sm text-strong placeholder:text-faint/70 focus:border-brand-400/60 focus:outline-none sm:pl-9 sm:pr-3"
           placeholder="Cerca…"
           aria-label="Cerca materia, lezione o avviso"
           value={value}
@@ -150,16 +150,16 @@ export function NavSearch({ compact = false }: { compact?: boolean }) {
           onKeyDown={onKeyDown}
         />
         {loading && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-mist-400" aria-hidden>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-faint" aria-hidden>
             …
           </span>
         )}
       </div>
 
       {showPanel && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-white/12 bg-ink-900 shadow-2xl shadow-black/50 sm:w-[26rem]">
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-line-strong bg-surface shadow-2xl shadow-black/50 sm:w-[26rem]">
           {visibleHits.length === 0 ? (
-            <p className="px-4 py-6 text-center text-xs text-mist-400">
+            <p className="px-4 py-6 text-center text-xs text-faint">
               {loading ? "Sto cercando…" : `Nessun risultato per «${value.trim()}».`}
             </p>
           ) : (
@@ -174,17 +174,17 @@ export function NavSearch({ compact = false }: { compact?: boolean }) {
                     }}
                     onMouseEnter={() => setActive(index)}
                     className={`flex items-start gap-2.5 px-3 py-2 text-sm transition-colors ${
-                      index === active ? "bg-brand-500/15" : "hover:bg-white/5"
+                      index === active ? "bg-brand-500/15" : "hover:bg-surface-2"
                     }`}
                   >
                     <span aria-hidden className="mt-0.5 text-xs">
                       {KIND_ICON[hit.kind]}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-medium text-white">{hit.title}</span>
-                      {hit.subtitle && <span className="block truncate text-[11px] text-mist-400">{hit.subtitle}</span>}
+                      <span className="block truncate font-medium text-strong">{hit.title}</span>
+                      {hit.subtitle && <span className="block truncate text-[11px] text-faint">{hit.subtitle}</span>}
                     </span>
-                    <span className="mt-0.5 shrink-0 text-[10px] uppercase tracking-wider text-mist-400">
+                    <span className="mt-0.5 shrink-0 text-[10px] uppercase tracking-wider text-faint">
                       {KIND_LABEL[hit.kind]}
                     </span>
                   </Link>
@@ -192,7 +192,7 @@ export function NavSearch({ compact = false }: { compact?: boolean }) {
               ))}
             </ul>
           )}
-          <p className="border-t border-white/8 px-3 py-1.5 text-[10px] text-mist-400">
+          <p className="border-t border-line px-3 py-1.5 text-[10px] text-faint">
             ↑ ↓ per muoversi · Invio per aprire · Esc per chiudere
           </p>
         </div>

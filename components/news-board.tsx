@@ -182,11 +182,11 @@ export function NewsComposer({ isAdmin }: { isAdmin: boolean }) {
           maxLength={2000}
           required
         />
-        <p className={`mt-1 text-right text-[11px] ${room < 100 ? "text-amber-300" : "text-mist-400"}`}>{room} caratteri</p>
+        <p className={`mt-1 text-right text-[11px] ${room < 100 ? "text-amber-300" : "text-faint"}`}>{room} caratteri</p>
       </div>
 
       {isAdmin && (
-        <label className="flex items-center gap-2 text-xs text-mist-300">
+        <label className="flex items-center gap-2 text-xs text-muted">
           <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} />
           Fissa in cima (importante)
         </label>
@@ -210,7 +210,7 @@ export function NewsComposer({ isAdmin }: { isAdmin: boolean }) {
           Annulla
         </button>
       </div>
-      <p className="text-[11px] text-mist-400">
+      <p className="text-[11px] text-faint">
         Gli avvisi sono pubblici e visibili subito. Puoi rimuovere un avviso che hai scritto tu, dal dispositivo con cui l&apos;hai scritto.
       </p>
     </form>
@@ -280,8 +280,8 @@ export function NewsBoard({ posts, isAdmin }: { posts: NewsPost[]; isAdmin: bool
         <p className="text-3xl" aria-hidden>
           📣
         </p>
-        <p className="mt-2 text-sm font-semibold text-white">Nessun avviso ancora</p>
-        <p className="mt-1 text-xs text-mist-400">Il primo che scrive qualcosa lo vedranno tutti.</p>
+        <p className="mt-2 text-sm font-semibold text-strong">Nessun avviso ancora</p>
+        <p className="mt-1 text-xs text-faint">Il primo che scrive qualcosa lo vedranno tutti.</p>
       </div>
     );
   }
@@ -298,21 +298,21 @@ export function NewsBoard({ posts, isAdmin }: { posts: NewsPost[]; isAdmin: bool
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 {post.pinned && <span className="chip bg-gold-400/15 text-gold-400 ring-gold-400/30">📌 Fissato</span>}
-                <h3 className="text-sm font-semibold text-white">{post.title}</h3>
+                <h3 className="text-sm font-semibold text-strong">{post.title}</h3>
               </div>
-              <p className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-mist-200">{post.body}</p>
-              <p className="mt-2 text-[11px] text-mist-400">
+              <p className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-body">{post.body}</p>
+              <p className="mt-2 text-[11px] text-faint">
                 {post.author} · <time dateTime={post.createdAt}>{when(post.createdAt)}</time>
               </p>
             </div>
           </div>
 
           {(isAdmin || Boolean(myTokens[post.id])) && (
-            <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/8 pt-2">
+            <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-2">
               {isAdmin && (
                 <button
                   type="button"
-                  className="rounded-lg px-2 py-1 text-[11px] text-mist-400 hover:bg-white/8 hover:text-gold-400"
+                  className="rounded-lg px-2 py-1 text-[11px] text-faint hover:bg-surface-3 hover:text-gold-400"
                   onClick={() => togglePin(post.id, !post.pinned)}
                   disabled={busyId === post.id}
                 >
@@ -329,7 +329,7 @@ export function NewsBoard({ posts, isAdmin }: { posts: NewsPost[]; isAdmin: bool
                   >
                     {busyId === post.id ? "…" : "Conferma eliminazione"}
                   </button>
-                  <button type="button" className="rounded-lg px-2 py-1 text-[11px] text-mist-400" onClick={() => setConfirmId(null)}>
+                  <button type="button" className="rounded-lg px-2 py-1 text-[11px] text-faint" onClick={() => setConfirmId(null)}>
                     Annulla
                   </button>
                 </>

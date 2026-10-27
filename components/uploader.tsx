@@ -199,16 +199,16 @@ export function Uploader({ sessionId, sessionLabel, disabled, onUploaded }: Prop
           addFiles(e.dataTransfer.files);
         }}
         className={`rounded-xl border border-dashed px-4 py-5 text-center transition-colors ${
-          dragOver ? "border-brand-400/70 bg-brand-500/10" : "border-white/15 bg-ink-950/40"
+          dragOver ? "border-brand-400/70 bg-brand-500/10" : "border-line-strong bg-surface-2"
         }`}
       >
-        <p className="text-sm text-mist-300">
+        <p className="text-sm text-muted">
           Trascina qui i file oppure{" "}
           <button type="button" className="font-semibold text-brand-400 underline-offset-4 hover:underline" onClick={() => inputRef.current?.click()}>
             selezionali
           </button>
         </p>
-        <p className="mt-1 text-[11px] text-mist-400">
+        <p className="mt-1 text-[11px] text-faint">
           PDF, Word, PowerPoint, Excel, immagini, audio/video, ZIP · massimo {MAX_UPLOAD_BYTES / (1024 * 1024)} MB per file
         </p>
         <input
@@ -224,12 +224,12 @@ export function Uploader({ sessionId, sessionLabel, disabled, onUploaded }: Prop
         {queue.length > 0 && (
           <ul className="mt-3 space-y-1 text-left">
             {queue.map((f, index) => (
-              <li key={`${f.name}:${f.size}:${index}`} className="flex items-center gap-2 rounded-lg bg-white/5 px-2.5 py-1.5 text-xs text-mist-200">
+              <li key={`${f.name}:${f.size}:${index}`} className="flex items-center gap-2 rounded-lg bg-surface-2 px-2.5 py-1.5 text-xs text-body">
                 <span className="truncate">{f.name}</span>
-                <span className="ml-auto shrink-0 tabular-nums text-mist-400">{formatBytesClient(f.size)}</span>
+                <span className="ml-auto shrink-0 tabular-nums text-faint">{formatBytesClient(f.size)}</span>
                 <button
                   type="button"
-                  className="shrink-0 rounded px-1 text-mist-400 hover:text-red-300"
+                  className="shrink-0 rounded px-1 text-faint hover:text-red-300"
                   onClick={() => setQueue((prev) => prev.filter((_, i) => i !== index))}
                   disabled={busy}
                   aria-label={`Togli ${f.name}`}
@@ -242,8 +242,8 @@ export function Uploader({ sessionId, sessionLabel, disabled, onUploaded }: Prop
         )}
       </div>
 
-      <details className="rounded-xl border border-white/8 bg-ink-950/30 px-3 py-2">
-        <summary className="cursor-pointer text-xs font-medium text-mist-300">Aggiungi nome e nota (facoltativo)</summary>
+      <details className="rounded-xl border border-line bg-surface-2 px-3 py-2">
+        <summary className="cursor-pointer text-xs font-medium text-muted">Aggiungi nome e nota (facoltativo)</summary>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
           <input className="input" placeholder="Nome e cognome" maxLength={80} value={uploadedBy} onChange={(e) => setNameOverride(e.target.value)} />
           <input className="input" placeholder="Nota (es. slide + appunti)" maxLength={280} value={note} onChange={(e) => setNote(e.target.value)} />
@@ -257,14 +257,14 @@ export function Uploader({ sessionId, sessionLabel, disabled, onUploaded }: Prop
       )}
 
       {busy && (
-        <div className="rounded-xl border border-white/8 bg-ink-950/40 px-3 py-2.5" aria-live="polite">
-          <div className="flex items-center justify-between gap-2 text-xs text-mist-300">
+        <div className="rounded-xl border border-line bg-surface-2 px-3 py-2.5" aria-live="polite">
+          <div className="flex items-center justify-between gap-2 text-xs text-muted">
             <span className="truncate">{currentName}</span>
             <span className="shrink-0 tabular-nums">
               {phase === "checking" ? "preparazione…" : phase === "saving" ? "registrazione…" : `${progress}%`}
             </span>
           </div>
-          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/10">
+          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-3">
             <div
               className="h-full rounded-full bg-brand-500 transition-[width] duration-200"
               style={{ width: `${phase === "saving" ? 100 : phase === "checking" ? 5 : progress}%` }}

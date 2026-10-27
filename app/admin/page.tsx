@@ -17,8 +17,8 @@ export default async function AdminPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-400">Area riservata</p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight text-white">Amministrazione</h1>
-      <p className="mt-3 text-sm text-mist-300">
+      <h1 className="mt-2 text-3xl font-bold tracking-tight text-strong">Amministrazione</h1>
+      <p className="mt-3 text-sm text-muted">
         Chiunque può caricare e scaricare materiali e pubblicare avvisi. L&apos;eliminazione dei contenuti è riservata
         agli amministratori, che accedono qui con il codice configurato sul server.
       </p>
@@ -29,7 +29,7 @@ export default async function AdminPage() {
         ) : configured ? (
           <div className="surface p-5">
             <AdminLogin />
-            <p className="mt-3 text-[11px] text-mist-400">
+            <p className="mt-3 text-[11px] text-faint">
               Il codice è la variabile d&apos;ambiente <code className="rounded bg-black/30 px-1">ADMIN_PASSCODE</code>{" "}
               impostata su Vercel. Nessun altro può eliminare i contenuti.
             </p>
@@ -50,8 +50,8 @@ export default async function AdminPage() {
         )}
       </div>
 
-      <div className="mt-6 rounded-xl border border-white/8 bg-ink-900/50 p-4 text-xs text-mist-400">
-        <p className="font-semibold text-mist-300">Cosa può fare un amministratore</p>
+      <div className="mt-6 rounded-xl border border-line bg-surface-2 p-4 text-xs text-faint">
+        <p className="font-semibold text-muted">Cosa può fare un amministratore</p>
         <ul className="mt-2 list-inside list-disc space-y-1">
           <li>Eliminare materiali di lezione e materiali d&apos;esame di qualsiasi materia.</li>
           <li>Eliminare avvisi dalla bacheca.</li>

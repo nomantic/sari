@@ -67,7 +67,7 @@ export function LessonFeed({ entries, today, yearLabels }: Props) {
       {/* Sticky on desktop only: on phones it would eat half the screen while
           scrolling and hide the month headings underneath it. */}
       <div className="surface p-3 md:sticky md:top-24 md:z-30 md:backdrop-blur-xl">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-mist-300">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted">
           <label className="inline-flex items-center gap-1.5">
             <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
             Mostra anche le passate
@@ -78,7 +78,7 @@ export function LessonFeed({ entries, today, yearLabels }: Props) {
           </label>
           {availableYears.length > 1 && (
             <select
-              className="rounded-lg border border-white/10 bg-ink-950/60 px-2 py-1 text-xs text-mist-200"
+              className="rounded-lg border border-line bg-surface-2 px-2 py-1 text-xs text-body"
               value={year}
               onChange={(e) => setYear(e.target.value)}
               aria-label="Filtra per anno"
@@ -91,14 +91,14 @@ export function LessonFeed({ entries, today, yearLabels }: Props) {
               ))}
             </select>
           )}
-          <span className="ml-auto tabular-nums text-mist-400">
+          <span className="ml-auto tabular-nums text-faint">
             {filtered.length} {filtered.length === 1 ? "lezione" : "lezioni"}
           </span>
         </div>
       </div>
 
       {grouped.length === 0 && (
-        <p className="surface p-10 text-center text-sm text-mist-400">
+        <p className="surface p-10 text-center text-sm text-faint">
           {entries.length === 0
             ? "Nessuna lezione in calendario per il periodo attivo."
             : "Nessuna lezione trovata con questi filtri."}

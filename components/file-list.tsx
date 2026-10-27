@@ -63,7 +63,7 @@ export function FileList({
 
   if (!files.length) {
     return (
-      <p className="rounded-xl border border-dashed border-white/10 px-3 py-4 text-center text-xs text-mist-400">
+      <p className="rounded-xl border border-dashed border-line px-3 py-4 text-center text-xs text-faint">
         {emptyHint ?? "Nessun materiale ancora per questa lezione. Sei stato in aula? Carica il primo file."}
       </p>
     );
@@ -75,12 +75,12 @@ export function FileList({
       <ul className="space-y-1.5">
         {sortByUsefulness(files).map((file) => {
           const badge = fileTypeBadge(file);
-          const tone = fileTypeTone[badge] ?? "bg-white/6 text-mist-300 ring-white/10";
+          const tone = fileTypeTone[badge] ?? "bg-surface-2 text-muted ring-line";
           const votes = votesOf(file);
           return (
             <li
               key={file.key}
-              className="group flex items-start gap-3 rounded-xl border border-white/8 bg-ink-950/40 px-3 py-2.5 transition-colors hover:border-white/16"
+              className="group flex items-start gap-3 rounded-xl border border-line bg-surface-2 px-3 py-2.5 transition-colors hover:border-line-strong"
             >
               <span className={`grid h-9 w-12 shrink-0 place-items-center rounded-lg text-[10px] font-bold ring-1 ring-inset ${tone}`}>
                 {badge}
@@ -90,12 +90,12 @@ export function FileList({
                   href={`/api/files/download?key=${encodeURIComponent(file.key)}`}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="block truncate text-sm font-medium text-mist-200 underline-offset-4 hover:text-white hover:underline"
+                  className="block truncate text-sm font-medium text-body underline-offset-4 hover:text-strong hover:underline"
                   title={file.name}
                 >
                   {file.name}
                 </a>
-                <p className="mt-0.5 truncate text-[11px] text-mist-400">
+                <p className="mt-0.5 truncate text-[11px] text-faint">
                   {formatBytes(file.size)}
                   {file.uploadedBy ? ` · ${file.uploadedBy}` : ""}
                   {file.note ? ` · ${file.note}` : ""}
@@ -106,7 +106,7 @@ export function FileList({
                 href={`/api/files/download?key=${encodeURIComponent(file.key)}`}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="shrink-0 rounded-lg px-2 py-1.5 text-xs text-mist-400 transition-colors hover:bg-white/8 hover:text-white"
+                className="shrink-0 rounded-lg px-2 py-1.5 text-xs text-faint transition-colors hover:bg-surface-3 hover:text-strong"
                 aria-label={`Apri ${file.name}`}
               >
                 Apri
@@ -122,7 +122,7 @@ export function FileList({
                     >
                       {busyKey === file.key ? "…" : "Conferma"}
                     </button>
-                    <button type="button" className="rounded-lg px-2 py-1.5 text-xs text-mist-400 hover:text-white" onClick={() => setConfirmKey(null)}>
+                    <button type="button" className="rounded-lg px-2 py-1.5 text-xs text-faint hover:text-strong" onClick={() => setConfirmKey(null)}>
                       Annulla
                     </button>
                   </div>

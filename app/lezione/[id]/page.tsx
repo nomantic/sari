@@ -68,24 +68,24 @@ export default async function LessonPage({ params }: { params: Params }) {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <nav aria-label="Percorso" className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-mist-400">
-        <Link href="/calendario" className="hover:text-white">
+      <nav aria-label="Percorso" className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-faint">
+        <Link href="/calendario" className="hover:text-strong">
           Calendario
         </Link>
         <span>/</span>
-        <Link href={`/giorno/${session.date}`} className="hover:text-white">
+        <Link href={`/giorno/${session.date}`} className="hover:text-strong">
           {humanDate(session.date)}
         </Link>
         <span>/</span>
-        <span className="text-mist-300">{session.courseShort}</span>
+        <span className="text-muted">{session.courseShort}</span>
       </nav>
 
       <header className="mt-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-md bg-white/8 px-2 py-0.5 text-xs font-semibold tabular-nums text-white">
+          <span className="rounded-md bg-surface-3 px-2 py-0.5 text-xs font-semibold tabular-nums text-strong">
             {timeOf(session.start)}–{timeOf(session.end)}
           </span>
-          <span className="chip bg-white/5 text-mist-300 ring-white/10">Lezione {session.lessonNumber}/{session.totalLessons}</span>
+          <span className="chip bg-surface-2 text-muted ring-line">Lezione {session.lessonNumber}/{session.totalLessons}</span>
           {session.label && <span className="chip bg-violet-500/15 text-violet-300 ring-violet-500/30">{session.label}</span>}
           {session.date === today && <span className="chip bg-brand-500/20 text-brand-300 ring-brand-400/40">Oggi</span>}
           {files.length > 0 ? (
@@ -93,19 +93,19 @@ export default async function LessonPage({ params }: { params: Params }) {
               {files.length} {files.length === 1 ? "materiale" : "materiali"}
             </span>
           ) : (
-            <span className="chip bg-white/4 text-mist-400 ring-white/8">nessun materiale</span>
+            <span className="chip bg-surface-2 text-faint ring-line">nessun materiale</span>
           )}
         </div>
 
-        <h1 className="mt-3 text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl">
+        <h1 className="mt-3 text-2xl font-bold leading-tight tracking-tight text-strong sm:text-3xl">
           <Link href={`/corsi/${session.courseSlug}`} className="underline-offset-4 hover:underline">
             {session.courseName}
           </Link>
         </h1>
-        <p className="mt-1 text-sm text-mist-300">
+        <p className="mt-1 text-sm text-muted">
           {humanDate(session.date)} · {session.room}
         </p>
-        <p className="text-sm text-mist-400">{session.professors.join(", ")}</p>
+        <p className="text-sm text-faint">{session.professors.join(", ")}</p>
       </header>
 
       <div className="mt-6">
@@ -118,7 +118,7 @@ export default async function LessonPage({ params }: { params: Params }) {
         />
       </div>
 
-      <div className="mt-8 flex flex-wrap justify-between gap-2 border-t border-white/8 pt-4">
+      <div className="mt-8 flex flex-wrap justify-between gap-2 border-t border-line pt-4">
         {previous ? (
           <Link href={`/lezione/${previous.id}`} className="btn-ghost max-w-full text-xs">
             <span className="truncate">← {previous.courseShort} · {previous.date.split("-").reverse().slice(0, 2).join("/")}</span>
@@ -137,7 +137,7 @@ export default async function LessonPage({ params }: { params: Params }) {
 
       {sameDay.length > 0 && (
         <section className="mt-8">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-mist-400">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-faint">
             Altre lezioni del {session.date.split("-").reverse().slice(0, 2).join("/")}
           </h2>
           <ul className="mt-2 space-y-1.5">
@@ -145,11 +145,11 @@ export default async function LessonPage({ params }: { params: Params }) {
               <li key={other.id}>
                 <Link
                   href={`/lezione/${other.id}`}
-                  className="flex items-center gap-2 rounded-lg border border-white/8 bg-ink-950/40 px-3 py-2 text-xs transition-colors hover:border-white/16 hover:bg-white/5"
+                  className="flex items-center gap-2 rounded-lg border border-line bg-surface-2 px-3 py-2 text-xs transition-colors hover:border-line-strong hover:bg-surface-2"
                 >
-                  <span className="tabular-nums text-mist-400">{timeOf(other.start)}</span>
-                  <span className="min-w-0 flex-1 truncate text-mist-200">{other.courseName}</span>
-                  <span aria-hidden className="text-mist-400">
+                  <span className="tabular-nums text-faint">{timeOf(other.start)}</span>
+                  <span className="min-w-0 flex-1 truncate text-body">{other.courseName}</span>
+                  <span aria-hidden className="text-faint">
                     →
                   </span>
                 </Link>

@@ -76,8 +76,8 @@ export function AdminSessionCard() {
   return (
     <div className="surface p-5">
       <p className="text-sm font-semibold text-emerald-300">Sessione amministratore attiva</p>
-      <p className="mt-1.5 text-sm text-mist-300">
-        Puoi eliminare materiali e avvisi non pertinenti. I pulsanti <strong className="text-white">Elimina</strong>{" "}
+      <p className="mt-1.5 text-sm text-muted">
+        Puoi eliminare materiali e avvisi non pertinenti. I pulsanti <strong className="text-strong">Elimina</strong>{" "}
         compaiono sui file in ogni pagina materia e sugli avvisi. La sessione dura 12 ore.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">

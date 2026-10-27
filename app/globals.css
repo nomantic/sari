@@ -1,24 +1,85 @@
 @import "tailwindcss";
 
-@theme {
-  --color-ink-950: #070b16;
-  --color-ink-900: #0b1020;
-  --color-ink-850: #10162a;
-  --color-ink-800: #151c33;
-  --color-ink-700: #1d2542;
-  --color-ink-600: #2a3456;
-  --color-mist-400: #8b95b5;
-  --color-mist-300: #aab2cc;
-  --color-mist-200: #cdd3e4;
-  --color-brand-400: #7c9cff;
-  --color-brand-500: #5b7cfa;
-  --color-brand-600: #3f5fe0;
-  --color-gold-400: #e8b04b;
+/*
+ * ─────────────────────────────────────────────────────────────
+ *  Theme tokens
+ *
+ *  The whole UI is expressed with these names, never with raw colours, so
+ *  light and dark are one set of variables swapped by a `data-theme` attribute
+ *  on <html>. `--color-*` custom properties are what Tailwind turns into
+ *  utilities, so `bg-surface`, `text-strong`, `border-line`… follow the theme.
+ * ─────────────────────────────────────────────────────────────
+ */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-strong: var(--text-strong);
+  --color-body: var(--text-body);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-gold-400: var(--gold-400);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --color-warn: var(--warn);
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Elegant display serif, used only for the SARI wordmark. */
+  --font-display: var(--font-cormorant), "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
 }
 
-:root {
+/* Dark (default) */
+:root,
+html[data-theme="dark"] {
   color-scheme: dark;
+  --canvas: #070b16;
+  --surface: #0d1322;
+  --surface-2: #121a2c;
+  --surface-3: #1a2338;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.2);
+  --text-strong: #ffffff;
+  --text-body: #cdd3e4;
+  --text-muted: #aab2cc;
+  --text-faint: #8b95b5;
+  --brand-400: #7c9cff;
+  --brand-500: #5b7cfa;
+  --brand-600: #3f5fe0;
+  --gold-400: #e8b04b;
+  --up: #34d399;
+  --down: #f87171;
+  --warn: #fbbf24;
+  --glow-a: rgba(91, 124, 250, 0.18);
+  --glow-b: rgba(232, 176, 75, 0.09);
+}
+
+/* Light */
+html[data-theme="light"] {
+  color-scheme: light;
+  --canvas: #f6f5f2;
+  --surface: #ffffff;
+  --surface-2: #fbfaf8;
+  --surface-3: #f1efea;
+  --line: rgba(19, 24, 38, 0.1);
+  --line-strong: rgba(19, 24, 38, 0.22);
+  --text-strong: #10131c;
+  --text-body: #2b3140;
+  --text-muted: #4c5366;
+  --text-faint: #6c7383;
+  --brand-400: #4a63e0;
+  --brand-500: #3b52c9;
+  --brand-600: #2f42a6;
+  --gold-400: #a9711a;
+  --up: #0f8a5f;
+  --down: #c0392b;
+  --warn: #a05e07;
+  --glow-a: rgba(75, 99, 224, 0.1);
+  --glow-b: rgba(169, 113, 26, 0.08);
 }
 
 html {
@@ -28,18 +89,19 @@ html {
 
 body {
   background:
-    radial-gradient(1100px 520px at 12% -10%, rgba(91, 124, 250, 0.18), transparent 62%),
-    radial-gradient(900px 460px at 92% 0%, rgba(232, 176, 75, 0.09), transparent 58%),
-    var(--color-ink-950);
-  color: var(--color-mist-200);
+    radial-gradient(1100px 520px at 12% -10%, var(--glow-a), transparent 62%),
+    radial-gradient(900px 460px at 92% 0%, var(--glow-b), transparent 58%),
+    var(--color-canvas);
+  color: var(--color-body);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 ::selection {
-  background: rgba(91, 124, 250, 0.38);
-  color: #fff;
+  background: color-mix(in srgb, var(--color-brand-400) 35%, transparent);
+  color: var(--color-strong);
 }
 
 *:focus-visible {
@@ -48,12 +110,24 @@ body {
   border-radius: 6px;
 }
 
+/* ── SARI wordmark ─────────────────────────────────────────── */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  color: var(--color-strong);
+}
+.wordmark-rule {
+  background: linear-gradient(90deg, transparent, var(--color-brand-400), transparent);
+}
+
 @layer components {
   .surface {
-    @apply rounded-2xl border border-white/8 bg-ink-900/70 backdrop-blur-sm;
+    @apply rounded-2xl border border-line bg-surface;
   }
   .card-hover {
-    @apply transition-colors duration-150 hover:border-white/16 hover:bg-ink-850/80;
+    @apply transition-colors duration-150 hover:border-line-strong hover:bg-surface-2;
   }
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
@@ -62,28 +136,31 @@ body {
     @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-mist-200 transition-colors hover:border-white/20 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-surface-2 px-4 py-2.5 text-sm font-semibold text-body transition-colors hover:border-line-strong hover:bg-surface-3 disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-300 transition-colors hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+    border-color: color-mix(in srgb, var(--color-down) 35%, transparent);
+    background: color-mix(in srgb, var(--color-down) 12%, transparent);
+    color: var(--color-down);
   }
   .chip {
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium ring-1 ring-inset;
   }
   .input {
-    @apply w-full rounded-xl border border-white/10 bg-ink-950/60 px-3.5 py-2.5 text-sm text-white placeholder:text-mist-400/70 focus:border-brand-400/60 focus:outline-none;
+    @apply w-full rounded-xl border border-line bg-surface-2 px-3.5 py-2.5 text-sm text-strong placeholder:text-faint focus:border-brand-400 focus:outline-none;
   }
   .label {
-    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-mist-400;
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-faint;
   }
   .prose-note {
-    @apply text-sm leading-relaxed text-mist-300;
+    @apply text-sm leading-relaxed text-muted;
   }
 }
 
 .scroll-thin {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  scrollbar-color: var(--color-line-strong) transparent;
 }
 
 @keyframes shimmer {
@@ -92,7 +169,7 @@ body {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 100%);
+  background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
   background-size: 800px 100%;
   animation: shimmer 1.6s infinite linear;
 }

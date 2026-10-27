@@ -40,16 +40,16 @@ export async function NoticesBar() {
 
         <Link
           href="/avvisi"
-          className="min-w-0 flex-1 truncate text-sm text-mist-100 transition-colors hover:text-white hover:underline"
+          className="min-w-0 flex-1 truncate text-sm text-mist-100 transition-colors hover:text-strong hover:underline"
           title={first.title}
         >
           {first.pinned && <span aria-hidden className="mr-1">📌</span>}
-          <strong className="font-semibold text-white">{first.title}</strong>
-          <span className="text-mist-300"> — {first.body}</span>
+          <strong className="font-semibold text-strong">{first.title}</strong>
+          <span className="text-muted"> — {first.body}</span>
         </Link>
 
         {rest.length > 0 && (
-          <span className="hidden shrink-0 text-[11px] text-mist-400 xl:inline">
+          <span className="hidden shrink-0 text-[11px] text-faint xl:inline">
             +{rest.length} {rest.length === 1 ? "altro" : "altri"}
           </span>
         )}

@@ -29,12 +29,12 @@ export default async function NewsPage() {
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Avvisi</h1>
-          <p className="mt-2 max-w-xl text-mist-300">
+          <h1 className="text-3xl font-bold tracking-tight text-strong sm:text-4xl">Avvisi</h1>
+          <p className="mt-2 max-w-xl text-muted">
             Comunicazioni per tutti: cambi di aula, esami, materiali mancanti, appunti di gruppo. Chiunque può pubblicare.
           </p>
         </div>
-        <span className="text-xs text-mist-400">
+        <span className="text-xs text-faint">
           {posts.length} {posts.length === 1 ? "avviso" : "avvisi"}
         </span>
       </div>

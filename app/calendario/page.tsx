@@ -38,8 +38,8 @@ export default async function CalendarPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold-400">
             {ACTIVE_SCOPE.label}
           </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">Calendario delle lezioni</h1>
-          <p className="mt-2 max-w-2xl text-mist-300">
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-strong sm:text-4xl">Calendario delle lezioni</h1>
+          <p className="mt-2 max-w-2xl text-muted">
             Clicca su un giorno per vedere quali lezioni ci sono, in che aula e quali materiali sono già stati caricati.
           </p>
         </div>
@@ -57,7 +57,7 @@ export default async function CalendarPage() {
         <LessonCalendar entries={entries} today={today} />
       </div>
 
-      <p className="mt-6 text-xs text-mist-400">
+      <p className="mt-6 text-xs text-faint">
         Periodo attivo: {semester.label}, dal {semester.start.split("-").reverse().join("/")} al{" "}
         {semester.end.split("-").reverse().join("/")}. Le lezioni sospese e quelle aggiuntive sono già considerate.
       </p>

@@ -18,11 +18,11 @@ export default async function UploadPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Carica materiale</h1>
-      <p className="mt-3 text-mist-300">
-        Scegli la materia, poi la <strong className="text-white">data e l&apos;ora</strong> della lezione: il file finisce
+      <h1 className="text-3xl font-bold tracking-tight text-strong sm:text-4xl">Carica materiale</h1>
+      <p className="mt-3 text-muted">
+        Scegli la materia, poi la <strong className="text-strong">data e l&apos;ora</strong> della lezione: il file finisce
         esattamente nella lezione giusta, così tutti lo trovano subito. Se il materiale vale per tutta la materia (prove
-        passate, riassunti), scegli <strong className="text-white">Materiali d&apos;esame</strong>.
+        passate, riassunti), scegli <strong className="text-strong">Materiali d&apos;esame</strong>.
       </p>
 
       <div className="mt-8">
@@ -41,9 +41,9 @@ export default async function UploadPage() {
         />
       </div>
 
-      <div className="mt-8 rounded-xl border border-white/8 bg-ink-900/50 p-4 text-sm">
-        <p className="font-semibold text-white">Regole semplici</p>
-        <ul className="mt-2 list-inside list-disc space-y-1 text-mist-300">
+      <div className="mt-8 rounded-xl border border-line bg-surface-2 p-4 text-sm">
+        <p className="font-semibold text-strong">Regole semplici</p>
+        <ul className="mt-2 list-inside list-disc space-y-1 text-muted">
           <li>Chiunque può caricare e scaricare: il materiale è di tutti.</li>
           <li>Puoi rimuovere un file che hai caricato tu, dal dispositivo da cui l&apos;hai caricato.</li>
           <li>Non caricare materiale protetto da copyright o dati personali sensibili.</li>

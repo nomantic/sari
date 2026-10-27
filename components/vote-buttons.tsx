@@ -114,7 +114,7 @@ export function VoteButtons({
         className={`inline-flex items-center gap-1 rounded-lg border px-1.5 py-1 text-[11px] font-semibold transition-colors disabled:opacity-50 ${
           mine === 1
             ? "border-emerald-500/50 bg-emerald-500/20 text-emerald-300"
-            : "border-white/10 text-mist-400 hover:border-emerald-500/40 hover:text-emerald-300"
+            : "border-line text-faint hover:border-emerald-500/40 hover:text-emerald-300"
         }`}
       >
         <span aria-hidden>👍</span>
@@ -131,14 +131,14 @@ export function VoteButtons({
         className={`inline-flex items-center gap-1 rounded-lg border px-1.5 py-1 text-[11px] font-semibold transition-colors disabled:opacity-50 ${
           mine === -1
             ? "border-red-500/50 bg-red-500/20 text-red-300"
-            : "border-white/10 text-mist-400 hover:border-red-500/40 hover:text-red-300"
+            : "border-line text-faint hover:border-red-500/40 hover:text-red-300"
         }`}
       >
         <span aria-hidden>👎</span>
         <span className="tabular-nums">{down}</span>
       </button>
 
-      <span className="ml-1 text-[10px] text-mist-400" title="Punteggio (voti utili meno voti poco utili)">
+      <span className="ml-1 text-[10px] text-faint" title="Punteggio (voti utili meno voti poco utili)">
         {score > 0 ? `+${score}` : score}
       </span>
 

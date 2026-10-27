@@ -27,7 +27,7 @@ export function LessonViews({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-1 rounded-xl border border-white/8 bg-ink-900/60 p-1">
+      <div className="flex items-center gap-1 rounded-xl border border-line bg-surface p-1">
         {(
           [
             { key: "calendario", label: "Calendario" },
@@ -40,7 +40,7 @@ export function LessonViews({
             onClick={() => setView(option.key)}
             aria-pressed={view === option.key}
             className={`flex-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-              view === option.key ? "bg-brand-500 text-white" : "text-mist-300 hover:bg-white/6 hover:text-white"
+              view === option.key ? "bg-brand-500 text-strong" : "text-muted hover:bg-surface-2 hover:text-strong"
             }`}
           >
             {option.label}

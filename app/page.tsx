@@ -36,12 +36,12 @@ export default async function HomePage() {
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold-400">
           Università di Roma Tor Vergata · {ACADEMIC_YEAR} · {ACTIVE_SCOPE.label}
         </p>
-        <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
+        <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-strong sm:text-5xl">
           Scienze dell&apos;Amministrazione e delle Relazioni Internazionali
         </h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-mist-300">
-          Tutti i materiali delle lezioni del <strong className="text-white">primo anno, primo semestre</strong> — slide, appunti,
-          registrazioni — raccolti per <strong className="text-white">data e ora</strong> della lezione, così ognuno sa
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
+          Tutti i materiali delle lezioni del <strong className="text-strong">primo anno, primo semestre</strong> — slide, appunti,
+          registrazioni — raccolti per <strong className="text-strong">data e ora</strong> della lezione, così ognuno sa
           esattamente dove caricare e dove trovare ciò che serve per il giorno dopo.
         </p>
 
@@ -70,8 +70,8 @@ export default async function HomePage() {
             { label: "Lezioni con materiali", value: lessonsWithFiles },
           ].map((stat) => (
             <div key={stat.label} className="surface px-4 py-3">
-              <dt className="text-[11px] font-medium uppercase tracking-wider text-mist-400">{stat.label}</dt>
-              <dd className="mt-1 text-2xl font-bold tabular-nums text-white">{stat.value}</dd>
+              <dt className="text-[11px] font-medium uppercase tracking-wider text-faint">{stat.label}</dt>
+              <dd className="mt-1 text-2xl font-bold tabular-nums text-strong">{stat.value}</dd>
             </div>
           ))}
         </dl>
@@ -99,12 +99,12 @@ export default async function HomePage() {
           </div>
         )}
 
-        <div className="mt-6 rounded-xl border border-white/8 bg-ink-900/50 p-4">
+        <div className="mt-6 rounded-xl border border-line bg-surface-2 p-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className="text-xs font-semibold uppercase tracking-wider text-mist-400">
+            <p className="text-xs font-semibold uppercase tracking-wider text-faint">
               Materie attive · {ACTIVE_SCOPE.label}
             </p>
-            <Link href="/corsi" className="text-xs text-mist-400 underline-offset-4 hover:text-white hover:underline">
+            <Link href="/corsi" className="text-xs text-faint underline-offset-4 hover:text-strong hover:underline">
               tutte le materie →
             </Link>
           </div>
@@ -115,13 +115,13 @@ export default async function HomePage() {
               return (
                 <div
                   key={course.id}
-                  className="flex items-center gap-2 rounded-lg border border-white/8 bg-ink-950/40 px-3 py-2 transition-colors hover:border-brand-400/40"
+                  className="flex items-center gap-2 rounded-lg border border-line bg-surface-2 px-3 py-2 transition-colors hover:border-brand-400/40"
                 >
                   <Link href={`/corsi/${course.slug}`} className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-white hover:underline">{course.short}</span>
-                    <span className="block truncate text-[11px] text-mist-400">{course.professors.join(", ")}</span>
+                    <span className="block truncate text-sm font-semibold text-strong hover:underline">{course.short}</span>
+                    <span className="block truncate text-[11px] text-faint">{course.professors.join(", ")}</span>
                   </Link>
-                  <span className="shrink-0 text-right text-[11px] text-mist-400">
+                  <span className="shrink-0 text-right text-[11px] text-faint">
                     <span className="block tabular-nums">{course.sessions.length} lezioni</span>
                     <span className={covered > 0 ? "block text-emerald-300" : "block"}>{covered} con materiali</span>
                   </span>
@@ -130,7 +130,7 @@ export default async function HomePage() {
                     className={`shrink-0 rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-colors ${
                       exams > 0
                         ? "border-gold-400/40 bg-gold-400/15 text-gold-400 hover:bg-gold-400/25"
-                        : "border-white/10 text-mist-400 hover:border-gold-400/40 hover:text-gold-400"
+                        : "border-line text-faint hover:border-gold-400/40 hover:text-gold-400"
                     }`}
                     title={`Materiali d'esame (${exams})`}
                   >
@@ -149,13 +149,13 @@ export default async function HomePage() {
         yearLabels={YEAR_LABELS}
       />
 
-      <p className="mt-10 text-center text-xs text-mist-400">
+      <p className="mt-10 text-center text-xs text-faint">
         Calendario e orari trascritti da{" "}
-        <a href={SOURCE_URLS.semesterOne} target="_blank" rel="noreferrer noopener" className="underline underline-offset-4 hover:text-white">
+        <a href={SOURCE_URLS.semesterOne} target="_blank" rel="noreferrer noopener" className="underline underline-offset-4 hover:text-strong">
           I semestre
         </a>{" "}
         e{" "}
-        <a href={SOURCE_URLS.semesterTwo} target="_blank" rel="noreferrer noopener" className="underline underline-offset-4 hover:text-white">
+        <a href={SOURCE_URLS.semesterTwo} target="_blank" rel="noreferrer noopener" className="underline underline-offset-4 hover:text-strong">
           II semestre
         </a>
         . In caso di variazioni fa fede il sito ufficiale del corso.

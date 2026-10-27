@@ -56,8 +56,8 @@ export function NavMenu() {
             href={link.href}
             aria-current={isActive(link.href) ? "page" : undefined}
             className={`rounded-lg px-2.5 py-2 transition-colors ${
-              isActive(link.href) ? "bg-white/10 text-white" : "text-mist-300 hover:bg-white/5 hover:text-white"
-            } ${link.href === "/carica" ? "ml-1 bg-white/8 font-medium text-white hover:bg-white/14" : ""}`}
+              isActive(link.href) ? "bg-surface-3 text-strong" : "text-muted hover:bg-surface-2 hover:text-strong"
+            } ${link.href === "/carica" ? "ml-1 bg-surface-3 font-medium text-strong hover:bg-surface-3" : ""}`}
           >
             {link.label}
           </Link>
@@ -76,7 +76,7 @@ export function NavMenu() {
           aria-controls={menuId}
           aria-haspopup="menu"
           aria-label="Apri il menu di navigazione"
-          className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-white/12 bg-white/8 px-3 text-sm font-semibold text-white transition-colors hover:bg-white/14"
+          className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-line-strong bg-surface-3 px-3 text-sm font-semibold text-strong transition-colors hover:bg-surface-3"
         >
           Menu
           <span aria-hidden className={`text-[10px] transition-transform ${isOpen ? "rotate-180" : ""}`}>
@@ -88,7 +88,7 @@ export function NavMenu() {
           <div
             id={menuId}
             role="menu"
-            className="fixed inset-x-3 top-[4.25rem] z-50 overflow-hidden rounded-xl border border-white/12 bg-ink-900 shadow-2xl shadow-black/60 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[min(92vw,22rem)]"
+            className="fixed inset-x-3 top-[4.25rem] z-50 overflow-hidden rounded-xl border border-line-strong bg-surface shadow-2xl shadow-black/60 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[min(92vw,22rem)]"
           >
             <ul className="py-1">
               {LINKS.map((link) => (
@@ -101,14 +101,14 @@ export function NavMenu() {
                       setOpen(false);
                     }}
                     className={`flex items-center gap-3 px-4 py-3.5 transition-colors ${
-                      isActive(link.href) ? "bg-brand-500/15 text-white" : "text-mist-200 hover:bg-white/6 hover:text-white"
+                      isActive(link.href) ? "bg-brand-500/15 text-strong" : "text-body hover:bg-surface-2 hover:text-strong"
                     }`}
                   >
                     <span className="min-w-0 flex-1">
                       <span className="block text-[15px] font-medium">{link.label}</span>
-                      <span className="mt-0.5 block text-[11px] text-mist-400">{link.description}</span>
+                      <span className="mt-0.5 block text-[11px] text-faint">{link.description}</span>
                     </span>
-                    <span aria-hidden className="shrink-0 text-mist-400">
+                    <span aria-hidden className="shrink-0 text-faint">
                       →
                     </span>
                   </Link>
@@ -120,7 +120,7 @@ export function NavMenu() {
               onClick={() => {
                 setOpen(false);
               }}
-              className="block border-t border-white/8 px-4 py-3 text-xs text-mist-400 hover:text-white"
+              className="block border-t border-line px-4 py-3 text-xs text-faint hover:text-strong"
             >
               Amministrazione
             </Link>
