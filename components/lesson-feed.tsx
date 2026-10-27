@@ -14,7 +14,6 @@ interface Props {
   uploadsEnabled: boolean;
   today: string;
   yearLabels: Record<number, string>;
-  curriculumLabels: Record<string, string>;
 }
 
 const MONTH_LABELS = [
@@ -27,7 +26,7 @@ function monthHeading(isoDate: string): string {
   return `${MONTH_LABELS[m - 1]} ${y}`;
 }
 
-export function LessonFeed({ entries, uploadsEnabled, today, yearLabels, curriculumLabels }: Props) {
+export function LessonFeed({ entries, uploadsEnabled, today, yearLabels }: Props) {
   const [query, setQuery] = useState("");
   const [year, setYear] = useState<string>("all");
   const [showPast, setShowPast] = useState(false);
@@ -60,6 +59,14 @@ export function LessonFeed({ entries, uploadsEnabled, today, yearLabels, curricu
 
   let lastMonth = "";
 
+  // With a single year in scope the year filter is noise: only show it when the
+  // catalog actually spans more than one year (or includes electives).
+  const availableYears = Array.from(new Set(entries.map((e) => e.session.year))).sort((a, b) => {
+    if (a === 0) return 1;
+    if (b === 0) return -1;
+    return a - b;
+  });
+
   return (
     <div className="space-y-6">
       <div className="surface sticky top-16 z-30 -mx-1 p-3 backdrop-blur-xl">
@@ -80,18 +87,21 @@ export function LessonFeed({ entries, uploadsEnabled, today, yearLabels, curricu
               aria-label="Cerca lezioni"
             />
           </div>
-          <select
-            className="input sm:w-52"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            aria-label="Filtra per anno"
-          >
-            <option value="all">Tutti gli anni</option>
-            <option value="1">{yearLabels[1]}</option>
-            <option value="2">{yearLabels[2]}</option>
-            <option value="3">{yearLabels[3]}</option>
-            <option value="0">{yearLabels[0]}</option>
-          </select>
+          {availableYears.length > 1 && (
+            <select
+              className="input sm:w-52"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              aria-label="Filtra per anno"
+            >
+              <option value="all">Tutti gli anni</option>
+              {availableYears.map((y) => (
+                <option key={y} value={String(y)}>
+                  {yearLabels[y]}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-mist-300">
           <label className="inline-flex items-center gap-1.5">
@@ -104,14 +114,15 @@ export function LessonFeed({ entries, uploadsEnabled, today, yearLabels, curricu
           </label>
           <span className="ml-auto tabular-nums text-mist-400">
             {filtered.length} {filtered.length === 1 ? "lezione" : "lezioni"}
-            {curriculumLabels ? "" : ""}
           </span>
         </div>
       </div>
 
       {grouped.length === 0 && (
         <p className="surface p-10 text-center text-sm text-mist-400">
-          Nessuna lezione trovata con questi filtri.
+          {entries.length === 0
+            ? "Nessuna lezione in calendario per il periodo attivo."
+            : "Nessuna lezione trovata con questi filtri."}
         </p>
       )}
 
@@ -150,3 +161,4 @@ export function LessonFeed({ entries, uploadsEnabled, today, yearLabels, curricu
     </div>
   );
 }
+

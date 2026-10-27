@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "check:r2": "node scripts/check-r2.mjs",
     "data:generate": "node data/generate-sessions.mjs"
   },
   "dependencies": {

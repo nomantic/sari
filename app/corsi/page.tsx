@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getCatalog } from "@/lib/catalog";
 import { CURRICULUM_LABELS } from "@/lib/constants";
+import { ACTIVE_SCOPE } from "@/lib/scope";
 import { filesBySession, isStorageConfigured } from "@/lib/storage";
 import type { FileRecord } from "@/lib/types";
 
@@ -21,7 +22,7 @@ const AREA_TONE: Record<string, string> = {
 };
 
 export default async function CoursesPage() {
-  const { courses } = getCatalog();
+  const { courses, hiddenCount } = getCatalog();
 
   let bySession = new Map<string, FileRecord[]>();
   if (isStorageConfigured()) {
@@ -32,31 +33,34 @@ export default async function CoursesPage() {
     }
   }
 
-  const groups: Array<{ title: string; subtitle?: string; items: typeof courses }> = [
+  // Only non-empty groups, so the page adapts to whatever scope is active.
+  const groups = [
     { title: "Primo anno", items: courses.filter((c) => c.year === 1) },
     { title: "Secondo anno", items: courses.filter((c) => c.year === 2) },
-    {
-      title: "Terzo anno",
-      subtitle: "Scegli il percorso didattico; gli insegnamenti a scelta sono comuni.",
-      items: courses.filter((c) => c.year === 3),
-    },
-    { title: "Insegnamenti a scelta", subtitle: "Aperti agli studenti del terzo anno di ogni percorso.", items: courses.filter((c) => c.year === 0) },
-  ];
+    { title: "Terzo anno", items: courses.filter((c) => c.year === 3) },
+    { title: "Insegnamenti a scelta", items: courses.filter((c) => c.year === 0) },
+  ].filter((group) => group.items.length > 0);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
       <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Insegnamenti</h1>
       <p className="mt-3 max-w-2xl text-mist-300">
-        L&apos;orario settimanale ufficiale è stato espanso in lezioni datate: apri un insegnamento per vedere ogni lezione
-        in ordine cronologico e caricare i materiali.
+        {ACTIVE_SCOPE.label} · l&apos;orario settimanale ufficiale è stato espanso in lezioni datate: apri un insegnamento per
+        vedere ogni lezione in ordine cronologico e caricare i materiali.
       </p>
+
+      {hiddenCount > 0 && (
+        <p className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/8 bg-white/4 px-3 py-1.5 text-xs text-mist-400">
+          Sono attive le lezioni del {ACTIVE_SCOPE.label.toLowerCase()}. Gli altri insegnamenti dell&apos;anno accademico
+          ({hiddenCount}) verranno attivati col secondo semestre.
+        </p>
+      )}
 
       <div className="mt-10 space-y-12">
         {groups.map((group) => (
           <section key={group.title}>
             <div className="flex flex-wrap items-baseline gap-x-3">
               <h2 className="text-lg font-semibold text-white">{group.title}</h2>
-              {group.subtitle && <p className="text-sm text-mist-400">{group.subtitle}</p>}
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -1,23 +1,29 @@
-import { courses } from "./courses";
+import { courses as allCourses } from "./courses";
 import { buildSessions } from "./schedule";
+import { ACTIVE_SCOPE, scopeCourses } from "./scope";
 import type { Course, LessonSession } from "./types";
 
-let cache: { courses: Course[]; sessions: LessonSession[] } | null = null;
+let cache: { courses: Course[]; sessions: LessonSession[]; hiddenCount: number } | null = null;
 
 /**
- * Courses decorated with their session ids, and the global chronological list
- * of every lesson of the academic year. Computed once per server process.
+ * Courses in the active scope (see `lib/scope.ts`), decorated with their dated
+ * lessons, plus the global chronological list of every lesson. Computed once
+ * per server process.
+ *
+ * Uploads are validated against this catalog, so a course outside the scope
+ * cannot be written to even by crafting an API request.
  */
 export function getCatalog() {
   if (!cache) {
-    const sessions = buildSessions(courses);
+    const inScope = scopeCourses(allCourses);
+    const sessions = buildSessions(inScope);
     const byCourse = new Map<string, LessonSession[]>();
     for (const s of sessions) {
       const list = byCourse.get(s.courseId) ?? [];
       list.push(s);
       byCourse.set(s.courseId, list);
     }
-    const decorated: Course[] = courses.map((c) => ({
+    const decorated: Course[] = inScope.map((c) => ({
       ...c,
       slug: c.id,
       yearLabel:
@@ -30,7 +36,11 @@ export function getCatalog() {
               : "Terzo anno",
       sessions: byCourse.get(c.id) ?? [],
     }));
-    cache = { courses: decorated, sessions };
+    cache = {
+      courses: decorated,
+      sessions,
+      hiddenCount: allCourses.length - decorated.length,
+    };
   }
   return cache;
 }
@@ -41,4 +51,8 @@ export function getCourse(slug: string): Course | undefined {
 
 export function getSession(id: string): LessonSession | undefined {
   return getCatalog().sessions.find((s) => s.id === id);
+}
+
+export function activeScopeLabel(): string {
+  return ACTIVE_SCOPE.label;
 }

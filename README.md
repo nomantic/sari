@@ -52,6 +52,31 @@ Risultato: **52 insegnamenti** e **~1.600 lezioni** per l'A.A. 2026/2027.
 Ogni lezione ha un id stabile, `corso-AAAA-MM-GG-HHMM`, usato anche come percorso
 nel bucket.
 
+### Cosa è attivo adesso
+
+L'app serve **solo il primo anno, I semestre**: 4 insegnamenti e 159 lezioni.
+
+| Insegnamento | Docente | Lezioni |
+| --- | --- | --- |
+| Storia Contemporanea | Michela Ponzani | 32 |
+| Storia delle Istituzioni Politiche | Marco Fioravanti | 47 |
+| Diritto Romano e fondamenti del diritto europeo | Roberta Marini | 48 |
+| Lingua Inglese B2 | Diane Axinte | 32 |
+
+Lo switch è in [`lib/scope.ts`](lib/scope.ts). Il resto del calendario **non è stato
+cancellato**: è nascosto e il server rifiuta anche upload verso lezioni fuori dal
+perimetro attivo.
+
+```ts
+export const ACTIVE_SCOPE: Scope = {
+  year: 1,        // null = tutti gli anni
+  semester: 1,    // null = entrambi i semestri
+  label: "Primo anno · I semestre",
+};
+```
+
+Per riaprire tutto basta modificare quei valori (`year: null, semester: null`).
+
 > Quando l'Ateneo pubblica un orario aggiornato basta modificare `lib/courses.ts`.
 > `npm run data:generate` rigenera il file JSON usato per i controlli rapidi.
 
@@ -63,6 +88,40 @@ Bucket: `sari` su Cloudflare R2. **Il bucket è privato**: nessuna operazione è
 senza credenziali. L'app non espone mai le chiavi al browser: firma le richieste con
 AWS Signature V4 lato server (`aws4fetch`) e restituisce al browser solo URL presigned a
 scadenza.
+
+### Perché il link del bucket non basta
+
+L'indirizzo
+`https://<account>.r2.cloudflarestorage.com/sari` **non è un indirizzo web pubblico**: è
+la *destinazione API* dello storage. Rispondendo senza credenziali, Cloudflare rifiuta
+la richiesta con `400 InvalidArgument / Authorization` — è il comportamento corretto,
+significa che il bucket non è aperto a chiunque abbia il link.
+
+Per fare upload e download servono **due stringhe segrete** (Access Key ID e Secret
+Access Key) che Cloudflare genera in un pannello separato dal bucket. Il link da solo
+non le contiene, quindi non può bastare: è come avere l'indirizzo della cassaforte senza
+la combinazione.
+
+> Il bucket deve restare privato: se lo si rende pubblico, chiunque potrebbe leggere e
+> scaricare i materiali di tutti gli studenti.
+
+### Dove trovare le due chiavi (5 minuti)
+
+1. Accedi a <https://dash.cloudflare.com> con l'account che possiede il bucket `sari`.
+2. Menu a sinistra → **R2 Object Storage**.
+3. In alto a destra → **Manage R2 API Tokens** (oppure *API → Tokens* dentro R2).
+4. **Create API token**:
+   - *Permissions*: **Object Read & Write**
+   - *Specify bucket(s)*: solo **`sari`** (non "all buckets")
+   - *TTL*: lascia vuoto o imposta una data di scadenza lunga.
+5. **Create**. La pagina mostra una sola volta:
+   - **Access Key ID** → variabile `R2_ACCESS_KEY_ID`
+   - **Secret Access Key** → variabile `R2_SECRET_ACCESS_KEY`
+
+   Copiale subito: il secret non viene più mostrato.
+
+Se il bucket `sari` non compare, controlla di essere nell'account Cloudflare giusto:
+l'ID `d126d2072cbefe37feb7b2c948b83f63` appartiene a un account specifico.
 
 Layout nel bucket:
 
@@ -108,7 +167,30 @@ MODERATOR_COOKIE_SECRET=un-altro-segreto-casuale
 Senza questo passaggio il caricamento dalla pagina fallisce con
 *«Connessione allo storage interrotta»*.
 
-4. Avvia:
+4. **Verifica le credenziali** prima di avviare l'app:
+
+```bash
+npm run check:r2
+```
+
+Scrive e cancella un file di prova nel bucket e dice esattamente cosa non va:
+
+```
+✓ scrittura riuscita
+✓ lettura riuscita
+✓ cancellazione riuscita
+```
+
+Esempi di errori e cosa significano:
+
+| Messaggio | Significato |
+| --- | --- |
+| `400 InvalidArgument Credential access key has length 20, should be 32` | La chiave è stata copiata male o è un ID account, non una API key. |
+| `401 Unauthorized` | Chiavi sintatticamente valide ma non esistenti / revocate / di un altro account. |
+| `403 AccessDenied` | Il token esiste ma non ha il permesso **Object Read & Write** sul bucket `sari`. |
+| `404 NoSuchBucket` | `R2_BUCKET` sbagliato o endpoint di un altro account. |
+
+5. Avvia:
 
 ```bash
 npm install

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { LessonCard } from "@/components/lesson-card";
 import { getCatalog, getCourse } from "@/lib/catalog";
 import { CURRICULUM_LABELS, SEMESTERS } from "@/lib/constants";
+import { ACTIVE_SCOPE } from "@/lib/scope";
 import { formatLongDate, todayIso } from "@/lib/format";
 import { filesBySession, isStorageConfigured } from "@/lib/storage";
 import type { FileRecord } from "@/lib/types";
@@ -168,7 +169,9 @@ export default async function CoursePage({ params }: { params: Params }) {
 
         {course.sessions.length === 0 ? (
           <div className="surface mt-4 p-8 text-center text-sm text-mist-400">
-            L&apos;orario di questo insegnamento non è ancora stato pubblicato dal corso di studi.
+            {course.schedule.length === 0
+              ? "L'orario di questo insegnamento non è ancora stato pubblicato dal corso di studi."
+              : ACTIVE_SCOPE.emptyHint}
           </div>
         ) : (
           <div className="mt-4 grid gap-3">
