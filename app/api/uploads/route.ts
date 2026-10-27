@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/catalog";
-import { objectKeyFor, sanitizeFileName, validateUpload } from "@/lib/format";
+import { examObjectKeyFor, objectKeyFor, sanitizeFileName, validateUpload } from "@/lib/format";
 import { isStorageConfigured, listFiles, presignUrl } from "@/lib/storage";
+import { resolveTarget } from "@/lib/targets";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -40,8 +41,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Richiesta non valida." }, { status: 400 });
   }
 
-  const session = body.sessionId ? getSession(body.sessionId) : undefined;
-  if (!session) return NextResponse.json({ error: "Lezione non trovata." }, { status: 404 });
+  const target = body.sessionId ? resolveTarget(String(body.sessionId)) : null;
+  if (!target) return NextResponse.json({ error: "Lezione o insegnamento non trovato." }, { status: 404 });
 
   const invalid = validateUpload({
     name: String(body.fileName ?? ""),
@@ -50,7 +51,10 @@ export async function POST(request: Request) {
   });
   if (invalid) return NextResponse.json({ error: invalid }, { status: 400 });
 
-  const key = objectKeyFor(session, String(body.fileName));
+  const key =
+    target.kind === "exam"
+      ? examObjectKeyFor(target.courseId, String(body.fileName))
+      : objectKeyFor(getSession(target.id)!, String(body.fileName));
   const displayName = sanitizeFileName(String(body.fileName));
   const contentType =
     body.contentType && /^[\w.+-]+\/[\w.+-]+$/.test(String(body.contentType))
@@ -62,7 +66,7 @@ export async function POST(request: Request) {
   let duplicateName: string | null = null;
   try {
     const sameName = (await listFiles()).filter(
-      (f) => f.sessionId === session.id && f.name.toLowerCase() === displayName.toLowerCase(),
+      (f) => f.sessionId === target.id && f.name.toLowerCase() === displayName.toLowerCase(),
     );
     duplicateName = sameName.length ? sameName[0].name : null;
   } catch {
@@ -72,7 +76,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     uploadUrl,
     key,
-    sessionId: session.id,
+    sessionId: target.id,
     fileName: displayName,
     contentType,
     duplicateName,

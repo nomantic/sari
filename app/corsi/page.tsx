@@ -3,8 +3,9 @@ import Link from "next/link";
 import { getCatalog } from "@/lib/catalog";
 import { CURRICULUM_LABELS } from "@/lib/constants";
 import { ACTIVE_SCOPE } from "@/lib/scope";
-import { filesBySession, isStorageConfigured } from "@/lib/storage";
+import { filesByTarget, isStorageConfigured } from "@/lib/storage";
 import type { FileRecord } from "@/lib/types";
+import { examTargetId } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,7 @@ export default async function CoursesPage() {
   let bySession = new Map<string, FileRecord[]>();
   if (isStorageConfigured()) {
     try {
-      bySession = await filesBySession();
+      bySession = await filesByTarget();
     } catch (err) {
       console.error("[corsi] indice materiali non disponibile:", err);
     }
@@ -67,6 +68,7 @@ export default async function CoursesPage() {
               {group.items.map((course) => {
                 const files = course.sessions.reduce((sum, s) => sum + (bySession.get(s.id)?.length ?? 0), 0);
                 const withFiles = course.sessions.filter((s) => (bySession.get(s.id)?.length ?? 0) > 0).length;
+                const examFiles = bySession.get(examTargetId(course.id))?.length ?? 0;
                 return (
                   <Link
                     key={course.id}
@@ -100,7 +102,12 @@ export default async function CoursesPage() {
                       <p className={files > 0 ? "mt-1 text-emerald-300" : "mt-1"}>
                         {files > 0
                           ? `${files} ${files === 1 ? "materiale" : "materiali"} · ${withFiles} ${withFiles === 1 ? "lezione coperta" : "lezioni coperte"}`
-                          : "Nessun materiale"}
+                          : "Nessun materiale delle lezioni"}
+                      </p>
+                      <p className={examFiles > 0 ? "mt-1 text-gold-400" : "mt-1"}>
+                        {examFiles > 0
+                          ? `Esame: ${examFiles} ${examFiles === 1 ? "file" : "file"}`
+                          : "Esame: nessun file"}
                       </p>
                     </div>
                   </Link>
@@ -113,3 +120,4 @@ export default async function CoursesPage() {
     </div>
   );
 }
+

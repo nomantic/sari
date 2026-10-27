@@ -7,7 +7,7 @@ import { useLocalStorageValue } from "./use-local-storage";
 import type { FileRecord } from "@/lib/types";
 import { fileTypeBadge, fileTypeTone, formatBytes } from "@/lib/format";
 
-export function FileList({ files }: { files: FileRecord[] }) {
+export function FileList({ files, emptyHint }: { files: FileRecord[]; emptyHint?: string }) {
   const router = useRouter();
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
@@ -50,7 +50,7 @@ export function FileList({ files }: { files: FileRecord[] }) {
   if (!files.length) {
     return (
       <p className="rounded-xl border border-dashed border-white/10 px-3 py-4 text-center text-xs text-mist-400">
-        Nessun materiale ancora per questa lezione. Sei stato in aula? Carica il primo file.
+        {emptyHint ?? "Nessun materiale ancora per questa lezione. Sei stato in aula? Carica il primo file."}
       </p>
     );
   }

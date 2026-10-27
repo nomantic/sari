@@ -4,8 +4,9 @@ import { getCatalog } from "@/lib/catalog";
 import { ACADEMIC_YEAR, SOURCE_URLS, YEAR_LABELS } from "@/lib/constants";
 import { ACTIVE_SCOPE } from "@/lib/scope";
 import { todayIso } from "@/lib/format";
-import { filesBySession, isStorageConfigured } from "@/lib/storage";
+import { filesByTarget, isStorageConfigured } from "@/lib/storage";
 import type { FileRecord } from "@/lib/types";
+import { examTargetId } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -17,13 +18,14 @@ export default async function HomePage() {
   let storageOk = false;
   try {
     storageOk = isStorageConfigured();
-    if (storageOk) bySession = await filesBySession();
+    if (storageOk) bySession = await filesByTarget();
   } catch (err) {
     console.error("[home] impossibile leggere l'indice dei materiali:", err);
   }
 
   const entries = sessions.map((session) => ({ session, files: bySession.get(session.id) ?? [] }));
-  const totalFiles = Array.from(bySession.values()).reduce((sum, list) => sum + list.length, 0);
+  const totalFiles = entries.reduce((sum, entry) => sum + entry.files.length, 0);
+  const examFiles = courses.reduce((sum, course) => sum + (bySession.get(examTargetId(course.id))?.length ?? 0), 0);
   const upcoming = sessions.filter((s) => s.date >= today);
   const lessonsWithFiles = sessions.filter((s) => (bySession.get(s.id)?.length ?? 0) > 0).length;
   const nextLesson = upcoming[0];
@@ -61,7 +63,8 @@ export default async function HomePage() {
           {[
             { label: "Insegnamenti", value: courses.length },
             { label: "Lezioni in calendario", value: sessions.length },
-            { label: "Materiali condivisi", value: totalFiles },
+            { label: "Materiali delle lezioni", value: totalFiles },
+            { label: "Materiali d'esame", value: examFiles },
             { label: "Lezioni con materiali", value: lessonsWithFiles },
           ].map((stat) => (
             <div key={stat.label} className="surface px-4 py-3">
@@ -106,21 +109,32 @@ export default async function HomePage() {
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
             {courses.map((course) => {
               const covered = course.sessions.filter((s) => (bySession.get(s.id)?.length ?? 0) > 0).length;
+              const exams = bySession.get(examTargetId(course.id))?.length ?? 0;
               return (
-                <Link
+                <div
                   key={course.id}
-                  href={`/corsi/${course.slug}`}
-                  className="flex items-center gap-3 rounded-lg border border-white/8 bg-ink-950/40 px-3 py-2 transition-colors hover:border-brand-400/40 hover:bg-brand-500/10"
+                  className="flex items-center gap-2 rounded-lg border border-white/8 bg-ink-950/40 px-3 py-2 transition-colors hover:border-brand-400/40"
                 >
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-white">{course.short}</span>
+                  <Link href={`/corsi/${course.slug}`} className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold text-white hover:underline">{course.short}</span>
                     <span className="block truncate text-[11px] text-mist-400">{course.professors.join(", ")}</span>
-                  </span>
+                  </Link>
                   <span className="shrink-0 text-right text-[11px] text-mist-400">
                     <span className="block tabular-nums">{course.sessions.length} lezioni</span>
                     <span className={covered > 0 ? "block text-emerald-300" : "block"}>{covered} con materiali</span>
                   </span>
-                </Link>
+                  <Link
+                    href={`/corsi/${course.slug}#materiali-esame`}
+                    className={`shrink-0 rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-colors ${
+                      exams > 0
+                        ? "border-gold-400/40 bg-gold-400/15 text-gold-400 hover:bg-gold-400/25"
+                        : "border-white/10 text-mist-400 hover:border-gold-400/40 hover:text-gold-400"
+                    }`}
+                    title={`Materiali d'esame (${exams})`}
+                  >
+                    🎓 {exams > 0 ? exams : "Esame"}
+                  </Link>
+                </div>
               );
             })}
           </div>
@@ -148,5 +162,6 @@ export default async function HomePage() {
     </div>
   );
 }
+
 
 

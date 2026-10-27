@@ -74,8 +74,13 @@ export interface LessonSession {
 }
 
 export interface FileRecord {
-  /** storage key inside the bucket, e.g. sari/sessions/<sessionId>/<uuid>__<name>.pdf */
+  /**
+   * storage key inside the bucket:
+   *   sari/sessions/<sessionId>/<uuid>__<name>   → material of one lesson
+   *   sari/exams/<courseId>/<uuid>__<name>       → material for the exam
+   */
   key: string;
+  /** Lesson id, or `exam:<courseId>` for exam materials. */
   sessionId: string;
   courseId: string;
   name: string;
@@ -85,6 +90,28 @@ export interface FileRecord {
   uploadedBy?: string;
   note?: string;
   hidden?: boolean;
+}
+
+/** What a set of files hangs off: a single lesson, or a whole course for the exam. */
+export interface FileTarget {
+  /** Id used as `FileRecord.sessionId` and in the storage key. */
+  id: string;
+  courseId: string;
+  kind: "lesson" | "exam";
+  /** e.g. "martedì 27 ottobre 2026 · 11:00–14:00", or "Materiali d'esame" */
+  label: string;
+}
+
+export function examTargetId(courseId: string): string {
+  return `exam:${courseId}`;
+}
+
+export function isExamTargetId(id: string): boolean {
+  return id.startsWith("exam:");
+}
+
+export function courseIdFromTarget(id: string): string {
+  return isExamTargetId(id) ? id.slice("exam:".length) : id;
 }
 
 export interface SessionWithFiles extends LessonSession {

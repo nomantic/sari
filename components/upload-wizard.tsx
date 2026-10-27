@@ -48,13 +48,19 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
   }, [course, showPast, today]);
 
   const session = course?.sessions.find((s) => s.id === sessionId);
+  const isExam = sessionId === `exam:${courseId}` && Boolean(course);
+  const targetLabel = isExam
+    ? `materiali d'esame di ${course!.name}`
+    : session
+      ? label(session)
+      : null;
 
   return (
     <div className="space-y-6">
       <ol className="flex items-center gap-2 text-xs font-medium">
         {[
           { n: 1, label: "Insegnamento", done: Boolean(course) },
-          { n: 2, label: "Data e ora", done: Boolean(session) },
+          { n: 2, label: "Data e ora / esame", done: Boolean(session) || isExam },
           { n: 3, label: "File", done: false },
         ].map((step) => (
           <li key={step.n} className="flex items-center gap-2">
@@ -124,9 +130,10 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
             className="input mt-2"
             value={sessionId}
             onChange={(e) => setSessionId(e.target.value)}
-            aria-label="Scegli la lezione per data e ora"
+            aria-label="Scegli la lezione per data e ora, oppure i materiali d'esame"
           >
             <option value="">— Scegli data e ora —</option>
+            <option value={`exam:${course.id}`}>🎓 Materiali d&apos;esame (per tutta la materia)</option>
             {sessionOptions.map((s) => (
               <option key={s.id} value={s.id}>
                 {label(s)} — {s.room}
@@ -145,17 +152,23 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
               <strong className="text-white">{label(session)}</strong> ({session.room}).
             </div>
           )}
+          {isExam && (
+            <div className="mt-3 rounded-xl border border-gold-400/30 bg-gold-400/10 px-3 py-2 text-xs text-gold-400">
+              Stai caricando <strong className="text-white">materiali d&apos;esame</strong> per tutta la materia: slide
+              complete, riassunti, prove passate.
+            </div>
+          )}
         </section>
       )}
 
       <section className="surface p-4">
         <h2 className="text-sm font-semibold text-white">3 · Carica i file</h2>
         <div className="mt-3">
-          {session ? (
-            <Uploader sessionId={session.id} sessionLabel={label(session)} disabled={!uploadsEnabled} onUploaded={onUploaded} />
+          {sessionId && targetLabel ? (
+            <Uploader sessionId={sessionId} sessionLabel={targetLabel} disabled={!uploadsEnabled} onUploaded={onUploaded} />
           ) : (
             <p className="rounded-xl border border-dashed border-white/10 px-3 py-6 text-center text-xs text-mist-400">
-              Scegli prima l&apos;insegnamento e la lezione (data e ora).
+              Scegli prima l&apos;insegnamento e la destinazione (lezione o materiali d&apos;esame).
             </p>
           )}
         </div>

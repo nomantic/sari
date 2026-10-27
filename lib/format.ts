@@ -1,6 +1,6 @@
-﻿import { ALLOWED_EXTENSIONS, MAX_UPLOAD_BYTES, TIMEZONE } from "./constants";
+import { ALLOWED_EXTENSIONS, MAX_UPLOAD_BYTES, TIMEZONE } from "./constants";
 import { sanitizeFileName } from "./sanitize";
-import type { FileRecord, LessonSession } from "./types";
+import type { FileRecord, FileTarget, LessonSession } from "./types";
 
 
 
@@ -26,14 +26,32 @@ export function validateUpload(input: { name: string; size: number; type?: strin
 }
 
 export function objectKeyFor(session: LessonSession, fileName: string): string {
-  const safe = sanitizeFileName(fileName);
-  const unique = crypto.randomUUID().slice(0, 8);
-  return `sari/sessions/${session.id}/${unique}__${safe}`;
+  return buildObjectKey(`sessions/${session.id}`, fileName);
 }
 
-/** Defense in depth: only keys the app itself could have created are deletable. */
+/** `sari/exams/<courseId>/<uuid8>__<name>` — material shared by the whole course. */
+export function examObjectKeyFor(courseId: string, fileName: string): string {
+  return buildObjectKey(`exams/${courseId}`, fileName);
+}
+
+function buildObjectKey(prefix: string, fileName: string): string {
+  const safe = sanitizeFileName(fileName);
+  const unique = crypto.randomUUID().slice(0, 8);
+  return `sari/${prefix}/${unique}__${safe}`;
+}
+
+/**
+ * Defense in depth: only keys the app itself could have created are accepted.
+ * Covers both lesson material (`sari/sessions/…`) and exam material
+ * (`sari/exams/…`); the manifest is still the authority on what is served.
+ */
 export function isManagedKey(key: string): boolean {
-  return /^sari\/sessions\/[a-z0-9\-]+\/[a-f0-9]{8}__[^\\]+$/i.test(key);
+  return /^sari\/(sessions\/[a-z0-9\-]+|exams\/[a-z0-9\-]+)\/[a-f0-9]{8}__[^\\]+$/i.test(key);
+}
+
+/** Prefix (`sari/sessions/<id>` or `sari/exams/<id>`) that a key must sit under. */
+export function keyPrefixFor(target: FileTarget): string {
+  return target.kind === "exam" ? `sari/exams/${target.courseId}/` : `sari/sessions/${target.id}/`;
 }
 
 export function formatBytes(bytes: number): string {

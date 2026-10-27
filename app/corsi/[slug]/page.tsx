@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LessonCard } from "@/components/lesson-card";
+import { ExamMaterials } from "@/components/exam-materials";
 import { getCatalog, getCourse } from "@/lib/catalog";
 import { CURRICULUM_LABELS, SEMESTERS } from "@/lib/constants";
 import { ACTIVE_SCOPE } from "@/lib/scope";
 import { formatLongDate, todayIso } from "@/lib/format";
-import { filesBySession, isStorageConfigured } from "@/lib/storage";
+import { filesByTarget, isStorageConfigured } from "@/lib/storage";
 import type { FileRecord } from "@/lib/types";
+import { examTargetId } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +41,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   let bySession = new Map<string, FileRecord[]>();
   if (isStorageConfigured()) {
     try {
-      bySession = await filesBySession();
+      bySession = await filesByTarget();
     } catch (err) {
       console.error("[corso] indice materiali non disponibile:", err);
     }
@@ -49,6 +51,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   const nextSession = course.sessions.find((s) => s.date >= today);
   const totalFiles = course.sessions.reduce((sum, s) => sum + (bySession.get(s.id)?.length ?? 0), 0);
   const covered = course.sessions.filter((s) => (bySession.get(s.id)?.length ?? 0) > 0).length;
+  const examCount = bySession.get(examTargetId(course.id))?.length ?? 0;
   const coverage = course.sessions.length ? Math.round((covered / course.sessions.length) * 100) : 0;
   const uploadsEnabled = isStorageConfigured() && process.env.UPLOADS_ENABLED !== "false";
 
@@ -135,6 +138,15 @@ export default async function CoursePage({ params }: { params: Params }) {
           </div>
         )}
 
+        <div className="mt-4 flex flex-wrap gap-2">
+          <a href="#materiali-esame" className="btn-primary text-xs">
+            🎓 Materiali d&apos;esame ({examCount})
+          </a>
+          <a href="#lezioni" className="btn-ghost text-xs">
+            Lezioni ({course.sessions.length})
+          </a>
+        </div>
+
         {course.schedule.length > 0 && (
           <div className="mt-6 surface p-4">
             <p className="text-xs font-semibold uppercase tracking-wider text-mist-400">Orario settimanale ufficiale</p>
@@ -158,6 +170,20 @@ export default async function CoursePage({ params }: { params: Params }) {
           </div>
         )}
       </header>
+
+      <div className="mt-10">
+        <ExamMaterials
+          courseId={course.id}
+          courseName={course.name}
+          files={bySession.get(examTargetId(course.id)) ?? []}
+          uploadsEnabled={uploadsEnabled}
+          stats={[
+            { label: "Lezioni con materiali", value: `${covered} / ${course.sessions.length}` },
+            { label: "Materiali delle lezioni", value: String(totalFiles) },
+            { label: "Crediti", value: course.cfu > 0 ? `${course.cfu} CFU` : "—" },
+          ]}
+        />
+      </div>
 
       <section className="mt-10" aria-labelledby="lezioni">
         <h2 id="lezioni" className="text-lg font-semibold text-white">
@@ -206,3 +232,4 @@ export default async function CoursePage({ params }: { params: Params }) {
     </div>
   );
 }
+

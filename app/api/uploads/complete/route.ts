@@ -1,7 +1,7 @@
-﻿import { NextResponse } from "next/server";
-import { getSession } from "@/lib/catalog";
+import { NextResponse } from "next/server";
 import { MAX_UPLOAD_BYTES } from "@/lib/constants";
-import { isManagedKey, sanitizeFileName, validateUpload } from "@/lib/format";
+import { isManagedKey, keyPrefixFor, sanitizeFileName, validateUpload } from "@/lib/format";
+import { resolveTarget } from "@/lib/targets";
 import {
   deleteObject,
   headObject,
@@ -43,12 +43,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Richiesta non valida." }, { status: 400 });
   }
 
-  const session = body.sessionId ? getSession(String(body.sessionId)) : undefined;
-  if (!session) return NextResponse.json({ error: "Lezione non trovata." }, { status: 404 });
+  const target = body.sessionId ? resolveTarget(String(body.sessionId)) : null;
+  if (!target) return NextResponse.json({ error: "Lezione o insegnamento non trovato." }, { status: 404 });
 
   const key = String(body.key ?? "");
-  if (!isManagedKey(key) || !key.startsWith(`sari/sessions/${session.id}/`)) {
-    return NextResponse.json({ error: "Chiave file non valida per questa lezione." }, { status: 400 });
+  if (!isManagedKey(key) || !key.startsWith(keyPrefixFor(target))) {
+    return NextResponse.json({ error: "Chiave file non valida per questa destinazione." }, { status: 400 });
   }
 
   const fileName = sanitizeFileName(String(body.fileName ?? key.split("__").pop() ?? "file"));
@@ -75,8 +75,8 @@ export async function POST(request: Request) {
 
   const record: FileRecord = {
     key,
-    sessionId: session.id,
-    courseId: session.courseId,
+    sessionId: target.id,
+    courseId: target.courseId,
     name: fileName,
     size: head.size,
     contentType: head.contentType || "application/octet-stream",

@@ -173,7 +173,11 @@ export async function listFiles(): Promise<FileRecord[]> {
   return files;
 }
 
-export async function filesBySession(): Promise<Map<string, FileRecord[]>> {
+/**
+ * Group visible files by target: a lesson id, or `exam:<courseId>` for a
+ * course's exam materials. One map serves both kinds.
+ */
+export async function filesByTarget(): Promise<Map<string, FileRecord[]>> {
   const map = new Map<string, FileRecord[]>();
   for (const file of await listFiles()) {
     const list = map.get(file.sessionId) ?? [];
