@@ -1,0 +1,165 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { Uploader } from "./uploader";
+import type { LessonSession } from "@/lib/types";
+
+interface CourseOption {
+  id: string;
+  name: string;
+  short: string;
+  professors: string[];
+  year: number;
+  sessions: LessonSession[];
+}
+
+interface Props {
+  courses: CourseOption[];
+  yearLabels: Record<number, string>;
+  defaultCourse?: string;
+  today: string;
+  uploadsEnabled: boolean;
+  onUploaded?: () => void;
+}
+
+const MONTHS = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+const WEEKDAYS = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"];
+
+function label(session: LessonSession): string {
+  const [y, m, d] = session.date.split("-").map(Number);
+  const weekday = WEEKDAYS[new Date(Date.UTC(y, m - 1, d, 12)).getUTCDay()];
+  return `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)} ${d} ${MONTHS[m - 1]} ${y} · ${session.start.slice(11, 16)}–${session.end.slice(11, 16)}`;
+}
+
+export function UploadWizard({ courses, yearLabels, defaultCourse, today, uploadsEnabled, onUploaded }: Props) {
+  const [courseId, setCourseId] = useState(defaultCourse ?? "");
+  const [sessionId, setSessionId] = useState("");
+  const [query, setQuery] = useState("");
+  const [showPast, setShowPast] = useState(false);
+
+  const course = courses.find((c) => c.id === courseId);
+
+  const sessionOptions = useMemo(() => {
+    if (!course) return [];
+    const list = showPast ? course.sessions : course.sessions.filter((s) => s.date >= today);
+    // A lesson stays uploadable for a while after it happens; past lessons are
+    // behind the toggle so the common case is short.
+    return list;
+  }, [course, showPast, today]);
+
+  const session = course?.sessions.find((s) => s.id === sessionId);
+
+  return (
+    <div className="space-y-6">
+      <ol className="flex items-center gap-2 text-xs font-medium">
+        {[
+          { n: 1, label: "Insegnamento", done: Boolean(course) },
+          { n: 2, label: "Data e ora", done: Boolean(session) },
+          { n: 3, label: "File", done: false },
+        ].map((step) => (
+          <li key={step.n} className="flex items-center gap-2">
+            <span
+              className={`grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold ${
+                step.done ? "bg-emerald-500 text-white" : "border border-white/15 bg-ink-900 text-mist-300"
+              }`}
+            >
+              {step.done ? "✓" : step.n}
+            </span>
+            <span className={step.done ? "text-white" : "text-mist-400"}>{step.label}</span>
+            {step.n < 3 && <span className="mx-1 h-px w-6 bg-white/15" aria-hidden />}
+          </li>
+        ))}
+      </ol>
+
+      <section className="surface p-4">
+        <h2 className="text-sm font-semibold text-white">1 · Quale insegnamento?</h2>
+        <input
+          type="search"
+          className="input mt-2"
+          placeholder="Cerca un insegnamento…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Cerca insegnamento"
+        />
+        <div className="scroll-thin mt-3 max-h-72 space-y-1.5 overflow-y-auto pr-1">
+          {courses
+            .filter((c) => {
+              const q = query.trim().toLowerCase();
+              if (!q) return true;
+              return `${c.name} ${c.short} ${c.professors.join(" ")}`.toLowerCase().includes(q);
+            })
+            .map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => {
+                  setCourseId(c.id);
+                  setSessionId("");
+                }}
+                className={`block w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                  courseId === c.id
+                    ? "border-brand-400/60 bg-brand-500/15"
+                    : "border-white/8 bg-ink-950/40 hover:border-white/16 hover:bg-white/5"
+                }`}
+              >
+                <span className="block text-sm font-medium text-white">{c.name}</span>
+                <span className="mt-0.5 block text-[11px] text-mist-400">
+                  {yearLabels[c.year]} · {c.professors.join(", ")} · {c.sessions.length} lezioni
+                </span>
+              </button>
+            ))}
+        </div>
+      </section>
+
+      {course && (
+        <section className="surface p-4">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold text-white">2 · Quale lezione?</h2>
+            <label className="inline-flex items-center gap-1.5 text-[11px] text-mist-300">
+              <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
+              includi lezioni passate
+            </label>
+          </div>
+          <select
+            className="input mt-2"
+            value={sessionId}
+            onChange={(e) => setSessionId(e.target.value)}
+            aria-label="Scegli la lezione per data e ora"
+          >
+            <option value="">— Scegli data e ora —</option>
+            {sessionOptions.map((s) => (
+              <option key={s.id} value={s.id}>
+                {label(s)} — {s.room}
+              </option>
+            ))}
+          </select>
+          {sessionOptions.length === 0 && (
+            <p className="mt-2 text-xs text-mist-400">
+              Nessuna lezione futura per questo insegnamento. Attiva «includi lezioni passate» per caricare materiali di una
+              lezione già svolta.
+            </p>
+          )}
+          {session && (
+            <div className="mt-3 rounded-xl border border-brand-400/30 bg-brand-500/10 px-3 py-2 text-xs text-brand-200">
+              Stai caricando materiali per la lezione del{" "}
+              <strong className="text-white">{label(session)}</strong> ({session.room}).
+            </div>
+          )}
+        </section>
+      )}
+
+      <section className="surface p-4">
+        <h2 className="text-sm font-semibold text-white">3 · Carica i file</h2>
+        <div className="mt-3">
+          {session ? (
+            <Uploader sessionId={session.id} sessionLabel={label(session)} disabled={!uploadsEnabled} onUploaded={onUploaded} />
+          ) : (
+            <p className="rounded-xl border border-dashed border-white/10 px-3 py-6 text-center text-xs text-mist-400">
+              Scegli prima l&apos;insegnamento e la lezione (data e ora).
+            </p>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}

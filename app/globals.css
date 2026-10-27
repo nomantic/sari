@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink-950: #070b16;
+  --color-ink-900: #0b1020;
+  --color-ink-850: #10162a;
+  --color-ink-800: #151c33;
+  --color-ink-700: #1d2542;
+  --color-ink-600: #2a3456;
+  --color-mist-400: #8b95b5;
+  --color-mist-300: #aab2cc;
+  --color-mist-200: #cdd3e4;
+  --color-brand-400: #7c9cff;
+  --color-brand-500: #5b7cfa;
+  --color-brand-600: #3f5fe0;
+  --color-gold-400: #e8b04b;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+body {
+  background:
+    radial-gradient(1100px 520px at 12% -10%, rgba(91, 124, 250, 0.18), transparent 62%),
+    radial-gradient(900px 460px at 92% 0%, rgba(232, 176, 75, 0.09), transparent 58%),
+    var(--color-ink-950);
+  color: var(--color-mist-200);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(91, 124, 250, 0.38);
+  color: #fff;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-brand-400);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@layer components {
+  .surface {
+    @apply rounded-2xl border border-white/8 bg-ink-900/70 backdrop-blur-sm;
+  }
+  .card-hover {
+    @apply transition-colors duration-150 hover:border-white/16 hover:bg-ink-850/80;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-mist-200 transition-colors hover:border-white/20 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-red-300 transition-colors hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium ring-1 ring-inset;
+  }
+  .input {
+    @apply w-full rounded-xl border border-white/10 bg-ink-950/60 px-3.5 py-2.5 text-sm text-white placeholder:text-mist-400/70 focus:border-brand-400/60 focus:outline-none;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-mist-400;
+  }
+  .prose-note {
+    @apply text-sm leading-relaxed text-mist-300;
+  }
+}
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite linear;
+}

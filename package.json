@@ -1,0 +1,30 @@
+{
+  "name": "sari-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SARI — materiali didattici organizzati per data e ora delle lezioni (Scienze dell'Amministrazione e delle Relazioni Internazionali, Università di Roma Tor Vergata)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "data:generate": "node data/generate-sessions.mjs"
+  },
+  "dependencies": {
+    "aws4fetch": "^1.0.20",
+    "next": "16.4.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.3",
+    "tailwindcss": "4.3.3",
+    "typescript": "^5"
+  }
+}
