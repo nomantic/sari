@@ -42,11 +42,22 @@ export async function rememberUploader(key: string, https: boolean): Promise<voi
 
 /** True when this browser is the uploader of `key` or is a moderator. */
 export async function canDelete(key: string, token?: string | null): Promise<{ allowed: boolean; role: "moderator" | "uploader" | null }> {
+  return canDeleteWith(key, token, uploaderToken(key));
+}
+
+/**
+ * Same rules, but with a caller-supplied "expected" token, so other resources
+ * (e.g. news posts) can keep their own token domain.
+ */
+export async function canDeleteWith(
+  key: string,
+  token: string | null | undefined,
+  expected: string,
+): Promise<{ allowed: boolean; role: "moderator" | "uploader" | null }> {
   const store = await cookies();
   if (isValidModeratorCookie(store.get(MODERATOR_COOKIE)?.value)) {
     return { allowed: true, role: "moderator" };
   }
-  const expected = uploaderToken(key);
   if (token && safeEqual(token, expected)) return { allowed: true, role: "uploader" };
   if (decodeCookie(store.get(UPLOADER_COOKIE)?.value ?? "").includes(key)) {
     return { allowed: true, role: "uploader" };

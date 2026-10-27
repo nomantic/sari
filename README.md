@@ -19,7 +19,25 @@ nel calendario e scarica.
 | `/corsi` | Tutti gli insegnamenti divisi per anno e per percorso (giuridico, storico-politico, economico). |
 | `/corsi/[slug]` | Una scheda per insegnamento: orario settimanale ufficiale, numero di lezioni, copertura dei materiali, **materiali d'esame** e **ogni lezione in ordine cronologico**. |
 | `/carica` | Procedura guidata in 3 passi: insegnamento → lezione (o materiali d'esame) → file. |
+| `/avvisi` | Bacheca: chiunque può pubblicare un avviso (titolo, testo, nome). Il moderatore può fissarne uno in cima o rimuoverli. |
 | `/moderatore` | Accesso del moderatore per eliminare materiali errati o duplicati. |
+
+### Avvisi (bacheca senza database)
+
+Gli avvisi stanno in un unico oggetto JSON nel bucket, `sari/news.json`, letto con cache di
+15 secondi. Non serve un database:
+
+- pubblicazione **istantanea**, visibile subito a tutti;
+- i **scritture sono serializzate nel processo** dell'app, quindi due avvisi pubblicati nello
+  stesso istante non si sovrascrivono (verificato con un test di concorrenza);
+- limite di 20 avvisi/ora per client (`NEWS_RATE_LIMIT_PER_HOUR`), per non farsi sommergere;
+- limiti: 120 caratteri di titolo, 2000 di testo, massimo 500 avvisi conservati;
+- chi ha scritto un avviso può rimuoverlo dal proprio dispositivo; il moderatore può rimuovere
+  e fissare qualsiasi avviso;
+- il testo è sempre trattato come testo (niente HTML o script).
+**Limite noto:** senza database le scritture non sono transazionali tra istanze diverse di
+Vercel. Con un corso e poche decine di avvisi al giorno non è un problema; se la bacheca
+crescesse servirebbe un database vero (Supabase o D1) — il resto dell'app non cambierebbe.
 
 ### Due tipi di materiale
 

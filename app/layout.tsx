@@ -47,6 +47,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/" className="rounded-lg px-2 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-3">
                 Calendario
               </Link>
+              <Link href="/avvisi" className="rounded-lg px-2 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-3">
+                Avvisi
+              </Link>
               <Link href="/corsi" className="rounded-lg px-2 py-2 text-mist-300 transition-colors hover:bg-white/5 hover:text-white sm:px-3">
                 <span className="hidden sm:inline">Materie</span>
                 <span className="sm:hidden">Materie</span>
