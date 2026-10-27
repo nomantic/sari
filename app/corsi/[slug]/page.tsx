@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LessonCard } from "@/components/lesson-card";
 import { ExamMaterials } from "@/components/exam-materials";
+import { isAdminRequest } from "@/lib/admin";
 import { getCatalog, getCourse } from "@/lib/catalog";
 import { CURRICULUM_LABELS, SEMESTERS } from "@/lib/constants";
 import { ACTIVE_SCOPE } from "@/lib/scope";
@@ -54,6 +55,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   const examCount = bySession.get(examTargetId(course.id))?.length ?? 0;
   const coverage = course.sessions.length ? Math.round((covered / course.sessions.length) * 100) : 0;
   const uploadsEnabled = isStorageConfigured() && process.env.UPLOADS_ENABLED !== "false";
+  const isAdmin = await isAdminRequest();
 
   const others = getCatalog()
     .courses.filter((c) => c.id !== course.id && c.year === course.year)
@@ -177,6 +179,7 @@ export default async function CoursePage({ params }: { params: Params }) {
           courseName={course.name}
           files={bySession.get(examTargetId(course.id)) ?? []}
           uploadsEnabled={uploadsEnabled}
+          isAdmin={isAdmin}
           stats={[
             { label: "Lezioni con materiali", value: `${covered} / ${course.sessions.length}` },
             { label: "Materiali delle lezioni", value: String(totalFiles) },
@@ -210,6 +213,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                   defaultOpen={session.id === nextSession?.id}
                   isToday={session.date === today}
                   isPast={session.date < today}
+                  isAdmin={isAdmin}
                 />
               </div>
             ))}

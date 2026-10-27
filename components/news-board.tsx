@@ -2,41 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { notifyLocalStorageChange, useLocalStorageValue, writeLocalStorage } from "./use-local-storage";
+import { useLocalStorageValue, writeLocalStorage } from "./use-local-storage";
 import type { NewsPost } from "@/lib/news";
-
-const TOKEN_KEY = "sari-news-tokens";
-
-function readTokens(): Record<string, string> {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(window.localStorage.getItem(TOKEN_KEY) ?? "{}") as Record<string, string>;
-  } catch {
-    return {};
-  }
-}
-
-function saveToken(id: string, token: string) {
-  try {
-    const tokens = readTokens();
-    tokens[id] = token;
-    window.localStorage.setItem(TOKEN_KEY, JSON.stringify(tokens));
-    notifyLocalStorageChange();
-  } catch {
-    // private mode — removal will then require the moderator
-  }
-}
-
-function dropToken(id: string) {
-  try {
-    const tokens = readTokens();
-    delete tokens[id];
-    window.localStorage.setItem(TOKEN_KEY, JSON.stringify(tokens));
-    notifyLocalStorageChange();
-  } catch {
-    // ignore
-  }
-}
 
 const DATE_FMT = new Intl.DateTimeFormat("it-IT", {
   timeZone: "Europe/Rome",
@@ -68,15 +35,8 @@ function initials(name: string): string {
     .join("");
 }
 
-function Toast({ text }: { text: string }) {
-  return (
-    <p className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-200" role="status">
-      {text}
-    </p>
-  );
-}
-
-export function NewsComposer({ isModerator }: { isModerator: boolean }) {
+/** Anyone can publish; this form is the only thing a normal visitor sees. */
+export function NewsComposer({ isAdmin }: { isAdmin: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -104,20 +64,22 @@ export function NewsComposer({ isModerator }: { isModerator: boolean }) {
       const data = (await res.json().catch(() => ({}))) as {
         error?: string;
         post?: { id: string };
-        token?: string;
       };
       if (!res.ok) throw new Error(data.error ?? "Pubblicazione non riuscita.");
-      if (data.post && data.token) saveToken(data.post.id, data.token);
-      if (pinned && isModerator && data.post) {
+
+      // Pinning is an admin action on an existing notice.
+      if (pinned && isAdmin && data.post) {
         await fetch("/api/news", {
           method: "PATCH",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ id: data.post.id, pinned: true }),
         });
       }
+
       writeLocalStorage("sari-news-author", author.trim());
       setTitle("");
       setBody("");
+      setPinned(false);
       setDone(true);
       setOpen(false);
       router.refresh();
@@ -134,7 +96,11 @@ export function NewsComposer({ isModerator }: { isModerator: boolean }) {
         <button type="button" className="btn-primary w-full" onClick={() => setOpen(true)}>
           ✏️ Scrivi un avviso
         </button>
-        {done && <Toast text="Avviso pubblicato. Lo vedono tutti gli studenti." />}
+        {done && (
+          <p className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-200" role="status">
+            Avviso pubblicato. Lo vedono tutti gli studenti.
+          </p>
+        )}
       </div>
     );
   }
@@ -185,7 +151,7 @@ export function NewsComposer({ isModerator }: { isModerator: boolean }) {
         <p className={`mt-1 text-right text-[11px] ${room < 100 ? "text-amber-300" : "text-mist-400"}`}>{room} caratteri</p>
       </div>
 
-      {isModerator && (
+      {isAdmin && (
         <label className="flex items-center gap-2 text-xs text-mist-300">
           <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} />
           Fissa in cima (importante)
@@ -211,26 +177,17 @@ export function NewsComposer({ isModerator }: { isModerator: boolean }) {
         </button>
       </div>
       <p className="text-[11px] text-mist-400">
-        Gli avvisi sono pubblici e visibili subito. Puoi rimuovere un avviso che hai scritto tu, dal dispositivo con cui l&apos;hai
-        pubblicato.
+        Gli avvisi sono pubblici e visibili subito. Solo un amministratore può rimuoverli.
       </p>
     </form>
   );
 }
 
-export function NewsBoard({ posts, isModerator }: { posts: NewsPost[]; isModerator: boolean }) {
+export function NewsBoard({ posts, isAdmin }: { posts: NewsPost[]; isAdmin: boolean }) {
   const router = useRouter();
-  const tokenStore = useLocalStorageValue(TOKEN_KEY);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  let tokens: Record<string, string> = {};
-  try {
-    tokens = tokenStore ? (JSON.parse(tokenStore) as Record<string, string>) : {};
-  } catch {
-    tokens = {};
-  }
 
   async function remove(id: string) {
     setBusyId(id);
@@ -239,11 +196,10 @@ export function NewsBoard({ posts, isModerator }: { posts: NewsPost[]; isModerat
       const res = await fetch("/api/news", {
         method: "DELETE",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ id, token: tokens[id] }),
+        body: JSON.stringify({ id }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Rimozione non riuscita.");
-      dropToken(id);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Errore inatteso.");
@@ -255,6 +211,7 @@ export function NewsBoard({ posts, isModerator }: { posts: NewsPost[]; isModerat
 
   async function togglePin(id: string, next: boolean) {
     setBusyId(id);
+    setError(null);
     try {
       const res = await fetch("/api/news", {
         method: "PATCH",
@@ -288,69 +245,61 @@ export function NewsBoard({ posts, isModerator }: { posts: NewsPost[]; isModerat
   return (
     <div className="space-y-3">
       {error && <p className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-200">{error}</p>}
-      {posts.map((post) => {
-        const mine = Boolean(tokens[post.id]);
-        return (
-          <article
-            key={post.id}
-            className={`surface p-4 ${post.pinned ? "border-gold-400/40 bg-gold-400/5" : ""}`}
-          >
-            <div className="flex items-start gap-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-500/20 text-[11px] font-bold text-brand-300">
-                {initials(post.author) || "??"}
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  {post.pinned && <span className="chip bg-gold-400/15 text-gold-400 ring-gold-400/30">📌 Fissato</span>}
-                  <h3 className="text-sm font-semibold text-white">{post.title}</h3>
-                </div>
-                <p className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-mist-200">{post.body}</p>
-                <p className="mt-2 text-[11px] text-mist-400">
-                  {post.author} · <time dateTime={post.createdAt}>{when(post.createdAt)}</time>
-                </p>
+      {posts.map((post) => (
+        <article key={post.id} className={`surface p-4 ${post.pinned ? "border-gold-400/40 bg-gold-400/5" : ""}`}>
+          <div className="flex items-start gap-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-500/20 text-[11px] font-bold text-brand-300">
+              {initials(post.author) || "??"}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                {post.pinned && <span className="chip bg-gold-400/15 text-gold-400 ring-gold-400/30">📌 Fissato</span>}
+                <h3 className="text-sm font-semibold text-white">{post.title}</h3>
               </div>
+              <p className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-mist-200">{post.body}</p>
+              <p className="mt-2 text-[11px] text-mist-400">
+                {post.author} · <time dateTime={post.createdAt}>{when(post.createdAt)}</time>
+              </p>
             </div>
+          </div>
 
-            {(isModerator || mine) && (
-              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/8 pt-2">
-                {isModerator && (
+          {isAdmin && (
+            <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/8 pt-2">
+              <button
+                type="button"
+                className="rounded-lg px-2 py-1 text-[11px] text-mist-400 hover:bg-white/8 hover:text-gold-400"
+                onClick={() => togglePin(post.id, !post.pinned)}
+                disabled={busyId === post.id}
+              >
+                {post.pinned ? "Togli da cima" : "Fissa in cima"}
+              </button>
+              {confirmId === post.id ? (
+                <>
                   <button
                     type="button"
-                    className="rounded-lg px-2 py-1 text-[11px] text-mist-400 hover:bg-white/8 hover:text-gold-400"
-                    onClick={() => togglePin(post.id, !post.pinned)}
+                    className="rounded-lg bg-red-500/20 px-2.5 py-1 text-[11px] font-semibold text-red-200 hover:bg-red-500/30"
+                    onClick={() => remove(post.id)}
                     disabled={busyId === post.id}
                   >
-                    {post.pinned ? "Togli da cima" : "Fissa in cima"}
+                    {busyId === post.id ? "…" : "Conferma eliminazione"}
                   </button>
-                )}
-                {confirmId === post.id ? (
-                  <>
-                    <button
-                      type="button"
-                      className="rounded-lg bg-red-500/20 px-2.5 py-1 text-[11px] font-semibold text-red-200 hover:bg-red-500/30"
-                      onClick={() => remove(post.id)}
-                      disabled={busyId === post.id}
-                    >
-                      {busyId === post.id ? "…" : "Conferma"}
-                    </button>
-                    <button type="button" className="rounded-lg px-2 py-1 text-[11px] text-mist-400" onClick={() => setConfirmId(null)}>
-                      Annulla
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    type="button"
-                    className="rounded-lg px-2 py-1 text-[11px] text-mist-400 hover:text-red-300"
-                    onClick={() => setConfirmId(post.id)}
-                  >
-                    Rimuovi
+                  <button type="button" className="rounded-lg px-2 py-1 text-[11px] text-mist-400" onClick={() => setConfirmId(null)}>
+                    Annulla
                   </button>
-                )}
-              </div>
-            )}
-          </article>
-        );
-      })}
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="rounded-lg px-2 py-1 text-[11px] text-red-300/70 hover:bg-red-500/10 hover:text-red-300"
+                  onClick={() => setConfirmId(post.id)}
+                >
+                  Elimina
+                </button>
+              )}
+            </div>
+          )}
+        </article>
+      ))}
     </div>
   );
 }

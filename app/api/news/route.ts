@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { isValidModeratorCookie, MODERATOR_COOKIE } from "@/lib/auth";
-import { canDeleteWith } from "@/lib/ownership";
-import { addNews, deleteNews, listNews, newsAuthorToken, setPinned, validateNews } from "@/lib/news";
+import { isAdminRequest } from "@/lib/admin";
+import { addNews, deleteNews, listNews, setPinned, validateNews } from "@/lib/news";
 import { isStorageConfigured } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
@@ -45,20 +43,26 @@ function notConfigured() {
   );
 }
 
+function badId() {
+  return NextResponse.json({ error: "Avviso non valido." }, { status: 400 });
+}
+
+const ID_RE = /^[a-z0-9-]{6,40}$/i;
+
 /** Board listing (used by the client after a post). */
 export async function GET() {
   if (!isStorageConfigured()) return notConfigured();
   const posts = await listNews();
-  return NextResponse.json({ posts: posts.map((post) => ({ ...post, isMine: false })) });
+  return NextResponse.json({ posts });
 }
 
 interface Body {
   title?: string;
   body?: string;
   author?: string;
-  pinned?: boolean;
 }
 
+/** Anyone may publish; the notice appears immediately. */
 export async function POST(request: Request) {
   if (!isStorageConfigured()) return notConfigured();
 
@@ -80,7 +84,7 @@ export async function POST(request: Request) {
   }
 
   const post = await addNews({ title: parsed.title, body: parsed.body, author: parsed.author });
-  return NextResponse.json({ ok: true, post, token: newsAuthorToken(post.id) });
+  return NextResponse.json({ ok: true, post });
 }
 
 interface PatchBody {
@@ -88,13 +92,11 @@ interface PatchBody {
   pinned?: boolean;
 }
 
-/** Pin/unpin — moderator only (pinned notices stay at the top for everyone). */
+/** Pin/unpin — admin only (pinned notices stay at the top for everyone). */
 export async function PATCH(request: Request) {
   if (!isStorageConfigured()) return notConfigured();
-
-  const store = await cookies();
-  if (!isValidModeratorCookie(store.get(MODERATOR_COOKIE)?.value)) {
-    return NextResponse.json({ error: "Solo il moderatore può fissare un avviso." }, { status: 403 });
+  if (!(await isAdminRequest())) {
+    return NextResponse.json({ error: "Solo un amministratore può fissare un avviso." }, { status: 403 });
   }
 
   let payload: PatchBody;
@@ -105,9 +107,7 @@ export async function PATCH(request: Request) {
   }
 
   const id = String(payload.id ?? "");
-  if (!/^[a-z0-9-]{6,40}$/i.test(id)) {
-    return NextResponse.json({ error: "Avviso non valido." }, { status: 400 });
-  }
+  if (!ID_RE.test(id)) return badId();
 
   const updated = await setPinned(id, Boolean(payload.pinned));
   if (!updated) return NextResponse.json({ error: "Avviso non trovato." }, { status: 404 });
@@ -116,12 +116,17 @@ export async function PATCH(request: Request) {
 
 interface DeleteBody {
   id?: string;
-  token?: string;
 }
 
-/** Removal: the author (from their device) or the moderator. */
+/** Removal — admin only. Publishing a notice does not let you remove it. */
 export async function DELETE(request: Request) {
   if (!isStorageConfigured()) return notConfigured();
+  if (!(await isAdminRequest())) {
+    return NextResponse.json(
+      { error: "Solo un amministratore può eliminare gli avvisi.", code: "FORBIDDEN" },
+      { status: 403 },
+    );
+  }
 
   let payload: DeleteBody;
   try {
@@ -131,23 +136,9 @@ export async function DELETE(request: Request) {
   }
 
   const id = String(payload.id ?? "");
-  if (!/^[a-z0-9-]{6,40}$/i.test(id)) {
-    return NextResponse.json({ error: "Avviso non valido." }, { status: 400 });
-  }
-
-  // Same ownership rules as files, in the news token domain.
-  const verdict = await canDeleteWith(`news:${id}`, payload.token, newsAuthorToken(id));
-  if (!verdict.allowed) {
-    return NextResponse.json(
-      {
-        error: "Puoi rimuovere solo gli avvisi che hai scritto tu, dal dispositivo con cui li hai pubblicati.",
-        code: "FORBIDDEN",
-      },
-      { status: 403 },
-    );
-  }
+  if (!ID_RE.test(id)) return badId();
 
   const removed = await deleteNews(id);
   if (!removed) return NextResponse.json({ error: "Avviso non trovato." }, { status: 404 });
-  return NextResponse.json({ ok: true, removed: removed.title, by: verdict.role });
+  return NextResponse.json({ ok: true, removed: removed.title });
 }

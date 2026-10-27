@@ -14,6 +14,7 @@ interface Props {
   defaultOpen?: boolean;
   isPast?: boolean;
   isToday?: boolean;
+  isAdmin?: boolean;
 }
 
 const MONTHS = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
@@ -29,7 +30,7 @@ function timeOf(isoDateTime: string) {
   return isoDateTime.slice(11, 16);
 }
 
-export function LessonCard({ session, files, uploadsEnabled, defaultOpen, isPast, isToday }: Props) {
+export function LessonCard({ session, files, uploadsEnabled, defaultOpen, isPast, isToday, isAdmin }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(Boolean(defaultOpen));
   const { day, month, weekday } = dateParts(session.date);
@@ -102,7 +103,7 @@ export function LessonCard({ session, files, uploadsEnabled, defaultOpen, isPast
               <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-mist-400">
                 Materiali condivisi ({files.length})
               </h3>
-              <FileList files={files} />
+              <FileList files={files} isAdmin={isAdmin} />
             </section>
             <section aria-labelledby={`upload-${session.id}`} className="order-1 lg:order-2">
               <h3 id={`upload-${session.id}`} className="mb-2 text-xs font-semibold uppercase tracking-wider text-mist-400">

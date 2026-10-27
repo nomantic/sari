@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { NewsBoard, NewsComposer } from "@/components/news-board";
-import { MODERATOR_COOKIE, isValidModeratorCookie } from "@/lib/auth";
+import { isAdminRequest } from "@/lib/admin";
 import { listNews, type NewsPost } from "@/lib/news";
 import { isStorageConfigured } from "@/lib/storage";
 
@@ -13,8 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function NewsPage() {
-  const store = await cookies();
-  const isModerator = isValidModeratorCookie(store.get(MODERATOR_COOKIE)?.value);
+  const isAdmin = await isAdminRequest();
   const storageOk = isStorageConfigured();
 
   let posts: NewsPost[] = [];
@@ -41,6 +39,12 @@ export default async function NewsPage() {
         </span>
       </div>
 
+      {isAdmin && (
+        <p className="mt-4 rounded-xl border border-brand-400/30 bg-brand-500/10 p-3 text-xs text-brand-200">
+          Modalità amministratore: puoi fissare ed eliminare qualsiasi avviso.
+        </p>
+      )}
+
       {!storageOk && (
         <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
           <p className="font-semibold">Storage non configurato</p>
@@ -52,11 +56,11 @@ export default async function NewsPage() {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
         <section aria-label="Elenco avvisi" className="order-2 lg:order-1">
-          <NewsBoard posts={ordered} isModerator={isModerator} />
+          <NewsBoard posts={ordered} isAdmin={isAdmin} />
         </section>
         <aside className="order-1 lg:order-2">
           <div className="lg:sticky lg:top-24">
-            <NewsComposer isModerator={isModerator} />
+            <NewsComposer isAdmin={isAdmin} />
           </div>
         </aside>
       </div>

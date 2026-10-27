@@ -11,6 +11,7 @@ interface Props {
   courseName: string;
   files: FileRecord[];
   uploadsEnabled: boolean;
+  isAdmin?: boolean;
   /** Statistic strip shown inside the panel (lesson coverage etc.). */
   stats?: Array<{ label: string; value: string }>;
 }
@@ -20,7 +21,7 @@ interface Props {
  * all lessons, past papers, summaries. Same upload/download/delete rules as
  * lesson material — the only difference is that it is not tied to a date.
  */
-export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, stats }: Props) {
+export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, stats, isAdmin }: Props) {
   const router = useRouter();
   const totalBytes = files.reduce((sum, f) => sum + f.size, 0);
 
@@ -71,6 +72,7 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
           </h3>
           <FileList
             files={files}
+            isAdmin={isAdmin}
             emptyHint="Nessun file per l'esame ancora. Carica per primo riassunti, prove passate o le slide complete del corso."
           />
         </section>

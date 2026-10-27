@@ -1,7 +1,6 @@
 /** Verify the 120 MB upload is indexed with the right size, without streaming it. */
 
 const BASE = "http://127.0.0.1:3210";
-const fs = await import("node:fs/promises");
 
 // Read the mock bucket manifest through its HTTP API surface instead of downloading the file.
 const res = await fetch(`${BASE}/api/uploads`, {

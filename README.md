@@ -19,8 +19,8 @@ nel calendario e scarica.
 | `/corsi` | Tutti gli insegnamenti divisi per anno e per percorso (giuridico, storico-politico, economico). |
 | `/corsi/[slug]` | Una scheda per insegnamento: orario settimanale ufficiale, numero di lezioni, copertura dei materiali, **materiali d'esame** e **ogni lezione in ordine cronologico**. |
 | `/carica` | Procedura guidata in 3 passi: insegnamento → lezione (o materiali d'esame) → file. |
-| `/avvisi` | Bacheca: chiunque può pubblicare un avviso (titolo, testo, nome). Il moderatore può fissarne uno in cima o rimuoverli. |
-| `/moderatore` | Accesso del moderatore per eliminare materiali errati o duplicati. |
+| `/avvisi` | Bacheca: chiunque può pubblicare un avviso (titolo, testo, nome). Solo l'amministratore può fissarne uno in cima o rimuoverli. |
+| `/admin` | Accesso amministratore: elimina materiali e avvisi non pertinenti. |
 
 ### Avvisi (bacheca senza database)
 
@@ -32,7 +32,7 @@ Gli avvisi stanno in un unico oggetto JSON nel bucket, `sari/news.json`, letto c
   stesso istante non si sovrascrivono (verificato con un test di concorrenza);
 - limite di 20 avvisi/ora per client (`NEWS_RATE_LIMIT_PER_HOUR`), per non farsi sommergere;
 - limiti: 120 caratteri di titolo, 2000 di testo, massimo 500 avvisi conservati;
-- chi ha scritto un avviso può rimuoverlo dal proprio dispositivo; il moderatore può rimuovere
+- solo un amministratore può rimuovere gli avvisi (chi scrive non può cancellarli); può anche
   e fissare qualsiasi avviso;
 - il testo è sempre trattato come testo (niente HTML o script).
 **Limite noto:** senza database le scritture non sono transazionali tra istanze diverse di
@@ -55,14 +55,19 @@ I due contenitori restano distinti anche nello storage e nelle API: non è possi
 caricare un file d'esame dentro una lezione (o viceversa), e le chiavi di un insegnamento
 fuori perimetro vengono rifiutate.
 
-### Permessi (come richiesto)
+### Permessi
 
-- **Chiunque può caricare** materiali (senza registrazione).
+- **Chiunque può caricare** materiali e pubblicare avvisi (senza registrazione).
 - **Chiunque può scaricare**.
-- **L'eliminazione è limitata**:
-  - chi ha caricato un file può rimuoverlo **dal proprio dispositivo** (cookie + token legati alla singola chiave, 7 giorni);
-  - il **moderatore** del corso, autenticato con un codice, può rimuovere qualsiasi file.
-- Se nessun codice moderatore è configurato, **nessuna eliminazione è possibile**.
+- **Solo gli amministratori eliminano.** Si accede da **`/admin`** con il codice
+  `ADMIN_PASSCODE`. Da lì si eliminano materiali di lezione, materiali d'esame e avvisi, e si
+  può fissare un avviso in cima.
+- Chi ha caricato un file **non** può rimuoverlo: pubblicare non dà alcun diritto.
+- Se `ADMIN_PASSCODE` non è impostato, **nessuna eliminazione è possibile**.
+
+La sessione amministratore è un cookie `HttpOnly` firmato e dura 12 ore. Il logout revoca la
+sessione lato server (un "epoch" salvato nel bucket): anche una copia del cookie smette di
+funzionare, cosa che svuotare solo il cookie nel browser non garantirebbe.
 
 ---
 
@@ -182,9 +187,9 @@ R2_BUCKET=sari
 R2_ACCESS_KEY_ID=...
 R2_SECRET_ACCESS_KEY=...
 
-# eliminazione: qualsiasi stringa lunga, almeno 8 caratteri
-MODERATOR_PASSCODE=una-password-lunga-e-casuale
-MODERATOR_COOKIE_SECRET=un-altro-segreto-casuale
+# amministrazione: codice di almeno 8 caratteri, si accede da /admin
+ADMIN_PASSCODE=una-password-lunga-e-casuale
+ADMIN_COOKIE_SECRET=un-altro-segreto-casuale
 ```
 
 3. **CORS sul bucket** — indispensabile, perché il browser carica direttamente su R2.
@@ -260,7 +265,7 @@ mai nel bundle, nel repository o nel browser.
   sanificato, chiavi validate con `isManagedKey()` prima di qualsiasi lettura o scrittura.
 - Il caricamento verifica che l'oggetto esista davvero su R2 (`HEAD`) prima di
   registrarlo, e usa la dimensione reale restituita dallo storage.
-- Cookie moderatore `HttpOnly`, `SameSite=Strict`, con `Secure` solo su HTTPS (così
+- Cookie amministratore `HttpOnly`, `SameSite=Strict`, con `Secure` solo su HTTPS (così
   funziona anche in locale e su rete interna).
 - Confronto dei segreti a tempo costante (`timingSafeEqual`).
 - Intestazioni di sicurezza (anti-sniffing, `frame-ancestors`, referrer policy) su ogni rotta.
@@ -275,20 +280,20 @@ app/
 ├── corsi/page.tsx               elenco insegnamenti
 ├── corsi/[slug]/page.tsx        lezioni di un insegnamento
 ├── carica/page.tsx              procedura guidata di caricamento
-├── moderatore/page.tsx          accesso moderatori
+├── admin/page.tsx               accesso amministratore
 └── api/
     ├── uploads/route.ts         presigned PUT (validazione)
     ├── uploads/complete/route.ts conferma + registrazione nel manifest
     ├── files/download/route.ts  streaming / redirect presigned
-    ├── files/delete/route.ts    eliminazione (uploader o moderatore)
-    └── moderator/route.ts       login/logout moderatore
+    ├── files/delete/route.ts    eliminazione (solo amministratore)
+    └── admin/route.ts           login/logout amministratore
 components/                      UI (lesson-card, uploader, file-list, wizard…)
 lib/
 ├── courses.ts                   dati del corso trascritti dal sito ufficiale
 ├── schedule.ts                  orario settimanale → lezioni datate
 ├── catalog.ts                   catalogo in memoria
 ├── storage.ts                   R2 (SigV4) + manifest + cache
-├── auth.ts / ownership.ts       permessi di eliminazione
+├── auth.ts / admin.ts           login e permessi di eliminazione
 └── format.ts                    date Europe/Rome, validazione, dimensioni
 scripts/mock-r2.mjs              mock S3 per i test locali (non usato in produzione)
 ```

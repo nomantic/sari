@@ -6,6 +6,7 @@ import { ACTIVE_SCOPE } from "@/lib/scope";
 import { todayIso } from "@/lib/format";
 import { filesByTarget, isStorageConfigured } from "@/lib/storage";
 import { listNews, type NewsPost } from "@/lib/news";
+import { isAdminRequest } from "@/lib/admin";
 import type { FileRecord } from "@/lib/types";
 import { examTargetId } from "@/lib/types";
 
@@ -195,6 +196,7 @@ export default async function HomePage() {
       <LessonFeed
         entries={entries}
         uploadsEnabled={storageOk && process.env.UPLOADS_ENABLED !== "false"}
+        isAdmin={await isAdminRequest()}
         today={today}
         yearLabels={YEAR_LABELS}
       />

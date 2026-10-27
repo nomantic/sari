@@ -120,8 +120,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 Strumento collaborativo non ufficiale. I materiali sono caricati dagli studenti; verificare sempre
                 programma e orari sul sito ufficiale dell&apos;Ateneo.
               </p>
-              <Link href="/moderatore" className="mt-3 inline-block text-xs text-mist-400 underline-offset-4 hover:text-white hover:underline">
-                Accesso moderatori
+              <Link href="/admin" className="mt-3 inline-block text-xs text-mist-400 underline-offset-4 hover:text-white hover:underline">
+                Amministrazione
               </Link>
             </div>
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { notifyLocalStorageChange, useLocalStorageValue, writeLocalStorage } from "./use-local-storage";
+import { useLocalStorageValue, writeLocalStorage } from "./use-local-storage";
 import { MAX_UPLOAD_BYTES } from "@/lib/constants";
 
 type Phase = "idle" | "checking" | "uploading" | "saving" | "done" | "error";
@@ -21,42 +21,7 @@ interface Props {
   onUploaded?: () => void;
 }
 
-const TOKEN_STORE_KEY = "sari-deletion-tokens";
-
-export function saveDeletionToken(key: string, token: string) {
-  try {
-    const raw = window.localStorage.getItem(TOKEN_STORE_KEY);
-    const parsed = raw ? (JSON.parse(raw) as Record<string, string>) : {};
-    parsed[key] = token;
-    window.localStorage.setItem(TOKEN_STORE_KEY, JSON.stringify(parsed));
-    notifyLocalStorageChange();
-  } catch {
-    // private mode / quota — deletion will simply require a moderator
-  }
-}
-
-export function getDeletionToken(key: string): string | null {
-  try {
-    const raw = window.localStorage.getItem(TOKEN_STORE_KEY);
-    if (!raw) return null;
-    return (JSON.parse(raw) as Record<string, string>)[key] ?? null;
-  } catch {
-    return null;
-  }
-}
-
-function forgetDeletionToken(key: string) {
-  try {
-    const raw = window.localStorage.getItem(TOKEN_STORE_KEY);
-    if (!raw) return;
-    const parsed = JSON.parse(raw) as Record<string, string>;
-    delete parsed[key];
-    window.localStorage.setItem(TOKEN_STORE_KEY, JSON.stringify(parsed));
-    notifyLocalStorageChange();
-  } catch {
-    // ignore
-  }
-}
+/** Uploads are open to everyone; deleting is reserved to admins (see /admin). */
 
 function putWithProgress(url: string, file: File, contentType: string, onProgress: (pct: number) => void): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -145,9 +110,8 @@ export function Uploader({ sessionId, sessionLabel, disabled, onUploaded }: Prop
         note: note.trim() || undefined,
       }),
     });
-    const completed = (await completeRes.json().catch(() => ({}))) as { error?: string; deletionToken?: string };
+    const completed = (await completeRes.json().catch(() => ({}))) as { error?: string };
     if (!completeRes.ok) throw new Error(completed.error ?? "Impossibile registrare il file.");
-    if (completed.deletionToken) saveDeletionToken(prepared.key, completed.deletionToken);
   }
 
   async function start() {
@@ -300,5 +264,3 @@ export function formatBytesClient(bytes: number): string {
   }
   return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[i]}`;
 }
-
-export { forgetDeletionToken };

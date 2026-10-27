@@ -1,30 +1,28 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import { getDeletionToken, forgetDeletionToken } from "./uploader";
-import { useLocalStorageValue } from "./use-local-storage";
+import { useState } from "react";
 import type { FileRecord } from "@/lib/types";
 import { fileTypeBadge, fileTypeTone, formatBytes } from "@/lib/format";
 
-export function FileList({ files, emptyHint }: { files: FileRecord[]; emptyHint?: string }) {
+/**
+ * Materials of one lesson or one subject. Deleting is admin-only, so the
+ * "Rimuovi" control is rendered only for an admin session — and the API checks
+ * the same thing server-side, so hiding it is convenience, not security.
+ */
+export function FileList({
+  files,
+  emptyHint,
+  isAdmin = false,
+}: {
+  files: FileRecord[];
+  emptyHint?: string;
+  isAdmin?: boolean;
+}) {
   const router = useRouter();
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  // Tokens live in localStorage; this hook re-renders when they change (after
-  // an upload or a removal) without reading storage during SSR.
-  const tokenStore = useLocalStorageValue("sari-deletion-tokens");
-  const owned = useMemo(() => {
-    let tokens: Record<string, string> = {};
-    try {
-      tokens = tokenStore ? (JSON.parse(tokenStore) as Record<string, string>) : {};
-    } catch {
-      tokens = {};
-    }
-    return new Set(files.filter((file) => typeof tokens[file.key] === "string").map((file) => file.key));
-  }, [files, tokenStore]);
 
   async function remove(file: FileRecord) {
     setBusyKey(file.key);
@@ -33,11 +31,10 @@ export function FileList({ files, emptyHint }: { files: FileRecord[]; emptyHint?
       const res = await fetch("/api/files/delete", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ key: file.key, token: getDeletionToken(file.key) }),
+        body: JSON.stringify({ key: file.key }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Eliminazione non riuscita.");
-      forgetDeletionToken(file.key);
       setConfirmKey(null);
       router.refresh();
     } catch (err) {
@@ -62,7 +59,6 @@ export function FileList({ files, emptyHint }: { files: FileRecord[]; emptyHint?
         {files.map((file) => {
           const badge = fileTypeBadge(file);
           const tone = fileTypeTone[badge] ?? "bg-white/6 text-mist-300 ring-white/10";
-          const isOwned = owned.has(file.key);
           return (
             <li
               key={file.key}
@@ -96,7 +92,7 @@ export function FileList({ files, emptyHint }: { files: FileRecord[]; emptyHint?
               >
                 Apri
               </a>
-              {isOwned &&
+              {isAdmin &&
                 (confirmKey === file.key ? (
                   <div className="flex shrink-0 items-center gap-1">
                     <button
@@ -114,11 +110,11 @@ export function FileList({ files, emptyHint }: { files: FileRecord[]; emptyHint?
                 ) : (
                   <button
                     type="button"
-                    className="shrink-0 rounded-lg px-2 py-1.5 text-xs text-mist-400 opacity-0 transition-opacity hover:text-red-300 focus:opacity-100 group-hover:opacity-100"
+                    className="shrink-0 rounded-lg px-2 py-1.5 text-xs text-red-300/70 hover:bg-red-500/10 hover:text-red-300"
                     onClick={() => setConfirmKey(file.key)}
-                    aria-label={`Rimuovi ${file.name}`}
+                    aria-label={`Elimina ${file.name}`}
                   >
-                    Rimuovi
+                    Elimina
                   </button>
                 ))}
             </li>

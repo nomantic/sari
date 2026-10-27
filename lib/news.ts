@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import { isStorageConfigured, putObject, getObjectText } from "./storage";
 
 /**
@@ -135,11 +134,7 @@ export async function setPinned(id: string, pinned: boolean): Promise<NewsPost |
   });
 }
 
-/** Ownership token for a post, so its author can remove it from their device. */
-export function newsAuthorToken(id: string): string {
-  const secret = process.env.MODERATOR_COOKIE_SECRET || process.env.MODERATOR_PASSCODE || "sari-dev-secret";
-  return createHash("sha256").update(`news:${id}:${secret}`).digest("hex").slice(0, 32);
-}
+/** Pinned notices stay at the top for everyone. */
 
 export function validateNews(input: { title?: unknown; body?: unknown; author?: unknown }):
   | { ok: true; title: string; body: string; author: string }
