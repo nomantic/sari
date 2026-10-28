@@ -116,28 +116,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </ul>
             </div>
 
-            {/* Chi c'è dietro al sito */}
+            {/* Sugli avvisi e sui materiali, non sull'autore */}
             <div>
-              <p className="font-semibold text-strong">Chi ha fatto questo sito</p>
+              <p className="font-semibold text-strong">Il sito</p>
               <p className="mt-2 text-faint">
-                Sviluppato da uno studente di SARI, per rendere i materiali del corso facili da trovare e da condividere.
+                Un posto solo per i materiali e gli avvisi del corso: ogni lezione ha la sua pagina con data e ora,
+                ogni materia uno spazio per i materiali d&apos;esame, e la bacheca per gli avvisi tra studenti.
               </p>
-              <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-faint">Sviluppatore</p>
-              <ul className="mt-1 space-y-1 text-faint">
-                <li>
-                  <a
-                    className="inline-flex items-center gap-1.5 hover:text-strong"
-                    href={DEVELOPER.instagramUrl}
-                    target="_blank"
-                    rel="noreferrer noopener me"
-                  >
-                    <span aria-hidden>↗</span> Instagram · {DEVELOPER.instagramHandle}
-                  </a>
+              <ul className="mt-3 space-y-1 text-faint">
+                <li className="flex gap-2">
+                  <span aria-hidden className="text-brand-400">·</span> Carica slide, appunti e registrazioni
                 </li>
-                <li>
-                  <a className="inline-flex items-center gap-1.5 hover:text-strong" href={DEVELOPER.converseryUrl} target="_blank" rel="noreferrer noopener">
-                    <span aria-hidden>↗</span> conversery.com
-                  </a>
+                <li className="flex gap-2">
+                  <span aria-hidden className="text-brand-400">·</span> Vota i materiali più utili
+                </li>
+                <li className="flex gap-2">
+                  <span aria-hidden className="text-brand-400">·</span> Calendario delle lezioni, con tema chiaro e scuro
                 </li>
               </ul>
             </div>
@@ -160,14 +154,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </span>
                 Google Play · Conversery AI
               </a>
+              <p className="mt-3 text-xs text-faint">
+                Un altro progetto di{" "}
+                <span className="font-semibold text-muted">Noman</span> ·{" "}
+                <a
+                  className="underline-offset-2 hover:text-strong hover:underline"
+                  href={DEVELOPER.instagramUrl}
+                  target="_blank"
+                  rel="noreferrer noopener me"
+                >
+                  {DEVELOPER.instagramHandle}
+                </a>
+              </p>
             </div>
           </div>
 
           <div className="border-t border-line">
             <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-faint sm:px-6">
               <p>
-                Strumento collaborativo <strong className="font-semibold text-muted">non ufficiale</strong>: i materiali
-                sono caricati dagli studenti. Per programmi e orari fa fede il sito dell&apos;Ateneo.
+                Sito realizzato da <span className="font-semibold text-muted">Noman</span> · strumento collaborativo{" "}
+                <strong className="font-semibold text-muted">non ufficiale</strong>: i materiali sono caricati dagli
+                studenti. Per programmi e orari fa fede il sito dell&apos;Ateneo.
               </p>
               <Link href="/admin" className="underline-offset-4 hover:text-strong hover:underline">
                 Amministrazione
