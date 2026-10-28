@@ -70,8 +70,11 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
         </div>
       </div>
 
-      <div className="grid gap-5 border-t border-line bg-surface-2 p-4 sm:p-5 lg:grid-cols-[1fr_320px]">
-        <section aria-label="File per l'esame" className="order-2 lg:order-1">
+      {/* On phones there is no inner inset: the uploader and the file list sit
+          at the card's edges, exactly like the uploader on a lesson page.
+          The inset comes back from sm up, and the fixed right column from lg. */}
+      <div className="grid gap-4 border-t border-line bg-surface-2 py-4 sm:gap-5 sm:px-5 sm:py-5 lg:grid-cols-[1fr_320px]">
+        <section aria-label="File per l'esame" className="order-2 min-w-0 px-3 sm:px-0 lg:order-1">
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
             File disponibili ({files.length})
           </h3>
@@ -81,7 +84,7 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
             emptyHint="Nessun file per l'esame ancora. Carica per primo riassunti, prove passate o le slide complete del corso."
           />
         </section>
-        <section aria-labelledby="carica-esame" className="order-1 lg:order-2">
+        <section aria-labelledby="carica-esame" className="order-1 min-w-0 lg:order-2">
           <h3 id="carica-esame" className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
             Carica per l&apos;esame
           </h3>

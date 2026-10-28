@@ -198,7 +198,7 @@ export function Uploader({ sessionId, sessionLabel, disabled, onUploaded }: Prop
           setDragOver(false);
           addFiles(e.dataTransfer.files);
         }}
-        className={`rounded-xl border border-dashed px-4 py-5 text-center transition-colors ${
+        className={`rounded-xl border border-dashed px-3 py-4 text-center transition-colors sm:px-4 sm:py-5 ${
           dragOver ? "border-brand-400/70 bg-brand-500/10" : "border-line-strong bg-surface-2"
         }`}
       >
