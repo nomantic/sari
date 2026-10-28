@@ -72,7 +72,7 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
               {step.done ? "✓" : step.n}
             </span>
             <span className={step.done ? "text-strong" : "text-faint"}>{step.label}</span>
-            {step.n < 3 && <span className="mx-1 h-px w-6 bg-white/15" aria-hidden />}
+            {step.n < 3 && <span className="mx-1 h-px w-6 bg-line-strong" aria-hidden />}
           </li>
         ))}
       </ol>

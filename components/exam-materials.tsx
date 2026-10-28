@@ -28,11 +28,11 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
   return (
     <section
       id="materiali-esame"
-      className="surface scroll-mt-24 overflow-hidden border-gold-400/20 bg-gradient-to-br from-gold-400/8 via-ink-900/70 to-ink-900/70"
+      className="surface scroll-mt-24 overflow-hidden border-gold-400/25 bg-gradient-to-br from-gold-400/10 to-transparent"
       aria-labelledby="materiali-esame-title"
     >
-      <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-gold-400/30 bg-gold-400/15 text-xl" aria-hidden>
+      <div className="flex items-start gap-3 p-4 sm:gap-4 sm:p-5">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gold-400/30 bg-gold-400/15 text-lg sm:h-12 sm:w-12 sm:text-xl" aria-hidden>
           🎓
         </div>
         <div className="min-w-0 flex-1">
@@ -53,9 +53,14 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
           </p>
 
           {stats && stats.length > 0 && (
-            <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+            /* One line per stat on phones, three columns from sm up: the same
+               rhythm as the course page above it. */
+            <dl className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-3 sm:gap-2">
               {stats.map((stat) => (
-                <div key={stat.label}>
+                <div
+                  key={stat.label}
+                  className="flex items-baseline justify-between gap-3 rounded-lg border border-line bg-surface-2 px-2.5 py-1.5 sm:block"
+                >
                   <dt className="text-[10px] uppercase tracking-wider text-faint">{stat.label}</dt>
                   <dd className="text-sm font-semibold tabular-nums text-strong">{stat.value}</dd>
                 </div>
@@ -65,7 +70,7 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
         </div>
       </div>
 
-      <div className="grid gap-5 border-t border-line bg-surface-2 p-5 lg:grid-cols-[1fr_320px]">
+      <div className="grid gap-5 border-t border-line bg-surface-2 p-4 sm:p-5 lg:grid-cols-[1fr_320px]">
         <section aria-label="File per l'esame" className="order-2 lg:order-1">
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
             File disponibili ({files.length})

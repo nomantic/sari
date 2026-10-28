@@ -40,7 +40,7 @@ export async function NoticesBar() {
 
         <Link
           href="/avvisi"
-          className="min-w-0 flex-1 truncate text-sm text-mist-100 transition-colors hover:text-strong hover:underline"
+          className="min-w-0 flex-1 truncate text-sm text-body transition-colors hover:text-strong hover:underline"
           title={first.title}
         >
           {first.pinned && <span aria-hidden className="mr-1">📌</span>}
