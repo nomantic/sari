@@ -34,18 +34,18 @@ export default async function HomePage() {
     <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
       <section className="pt-12 pb-10">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold-400">
-          Università di Roma Tor Vergata · {ACADEMIC_YEAR} · {ACTIVE_SCOPE.label}
+          {ACTIVE_SCOPE.label} · {ACADEMIC_YEAR}
         </p>
-        <h1 className="mt-3 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-strong sm:text-5xl">
-          Scienze dell&apos;Amministrazione e delle Relazioni Internazionali
+        {/* Short and scannable: the full course name is in the footer and in the
+            page metadata, so it does not need to dominate the first screen. */}
+        <h1 className="mt-2 text-2xl font-bold leading-tight tracking-tight text-strong sm:text-3xl">
+          Materiali delle lezioni
         </h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-          Tutti i materiali delle lezioni del <strong className="text-strong">primo anno, primo semestre</strong> — slide, appunti,
-          registrazioni — raccolti per <strong className="text-strong">data e ora</strong> della lezione, così ognuno sa
-          esattamente dove caricare e dove trovare ciò che serve per il giorno dopo.
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+          Slide, appunti e registrazioni, ordinati per <strong className="text-strong">data e ora</strong> della lezione.
         </p>
 
-        <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center gap-2 sm:gap-3">
           {nextLesson ? (
             <Link href={`#${nextLesson.id}`} className="btn-primary">
               Prossima lezione

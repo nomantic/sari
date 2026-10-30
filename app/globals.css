@@ -104,6 +104,23 @@ body {
   color: var(--color-strong);
 }
 
+/*
+ * Grid and flex children default to `min-width: auto`, so a chip row that will
+ * not wrap, or one long word, can force a column wider than the screen. Letting
+ * them shrink fixes this whole class of "wider than the UI" bug at once instead
+ * of chasing it page by page. Anything needing a floor sets its own min-width.
+ */
+@layer base {
+  :where(main, footer, header) :where(.grid, .flex) > * {
+    min-width: 0;
+  }
+
+  /* Long unbroken strings (URLs, file names) wrap instead of pushing out. */
+  :where(main, footer) :where(p, li, dd, dt, td, h1, h2, h3) {
+    overflow-wrap: anywhere;
+  }
+}
+
 *:focus-visible {
   outline: 2px solid var(--color-brand-400);
   outline-offset: 2px;

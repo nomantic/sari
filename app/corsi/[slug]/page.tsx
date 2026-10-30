@@ -203,9 +203,9 @@ export default async function CoursePage({ params }: { params: Params }) {
               : ACTIVE_SCOPE.emptyHint}
           </div>
         ) : (
-          <div className="mt-4 grid gap-3">
+          <div className="mt-4 grid min-w-0 gap-3">
             {course.sessions.map((session) => (
-              <div key={session.id} id={session.id} className="scroll-mt-24">
+              <div key={session.id} id={session.id} className="min-w-0 scroll-mt-24">
                 <LessonCard
                   session={session}
                   files={bySession.get(session.id) ?? []}
