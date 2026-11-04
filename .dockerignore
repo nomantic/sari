@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.gitignore
+
+# Never bake secrets into the image; env comes from .env at runtime.
+.env
+.env.*
+!.env.example
+
+Dockerfile
+docker-compose*.yml
+README.md
+*.tsbuildinfo
+next-env.d.ts
+data/*.json

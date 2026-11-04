@@ -10,6 +10,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Self-contained server bundle for the Docker image (deployed on EC2).
+  // Harmless for other hosts (e.g. Vercel) which ignore it.
+  output: "standalone",
   serverExternalPackages: ["aws4fetch"],
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
