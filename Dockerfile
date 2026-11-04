@@ -32,8 +32,8 @@ RUN addgroup --system --gid 1001 nodejs \
 # Standalone bundle already contains the node_modules the server needs.
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-# This app has no public/ dir; the COPY is still a no-op if one is added later.
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# This app has no public/ dir. If one is added later, uncomment the next line.
+# COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 RUN mkdir -p .next/cache && chown -R nextjs:nodejs .next
 
