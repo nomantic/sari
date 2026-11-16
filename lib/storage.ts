@@ -137,11 +137,17 @@ async function objectSizeFromListing(key: string): Promise<number | null> {
   url.searchParams.set("list-type", "2");
   url.searchParams.set("prefix", key);
   url.searchParams.set("max-keys", "5");
-  const res = await getClient().fetch(url.toString());
+  // R2 rejects a body-less GET to the list endpoint with 411 unless the
+  // explicit zero length is declared.
+  const res = await getClient().fetch(url.toString(), {
+    method: "GET",
+    headers: { "content-length": "0" },
+  });
   if (!res.ok) return null;
   const xml = await res.text();
   // Only accept an exact key match: the prefix could in principle match others.
-  const entry = new RegExp(`<Contents>[\\s\\S]*?<Key>${escapeXmlRe(key)}</Key>[\\s\\S]*?<Size>(\\d+)</Size>[\\s\\S]*?</Contents>`).exec(xml);
+  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const entry = new RegExp(`<Contents>[\\s\\S]*?<Key>${escaped}</Key>[\\s\\S]*?<Size>(\\d+)</Size>[\\s\\S]*?</Contents>`).exec(xml);
   if (!entry) return null;
   return Number(entry[1]);
 }
