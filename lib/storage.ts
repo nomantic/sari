@@ -102,14 +102,52 @@ export async function putObject(
   }
 }
 
+/**
+ * Size and type of a stored object.
+ *
+ * HEAD is not enough: when the object is served with `content-encoding: gzip`
+ * the response carries no `content-length`, so trusting that header reported
+ * every real upload as 0 bytes. The listing API always returns the true stored
+ * size, so that is the authoritative source, with HEAD as the type lookup.
+ */
 export async function headObject(key: string): Promise<{ size: number; contentType: string } | null> {
   const res = await getClient().fetch(objectUrl(key), { method: "HEAD" });
   if (res.status === 404) return null;
   if (!res.ok) throw new StorageError(`HEAD ${key} → ${res.status}`, res.status);
-  return {
-    size: Number(res.headers.get("content-length") ?? 0),
-    contentType: res.headers.get("content-type") ?? "application/octet-stream",
-  };
+
+  const headerLength = res.headers.get("content-length");
+  const contentType = res.headers.get("content-type") ?? "application/octet-stream";
+
+  // Present and meaningful → trust it.
+  if (headerLength !== null && Number(headerLength) > 0) {
+    return { size: Number(headerLength), contentType };
+  }
+
+  // Otherwise ask the listing, which reports the real object size.
+  const listed = await objectSizeFromListing(key);
+  if (listed === null) {
+    throw new StorageError(`Impossibile determinare la dimensione di ${key}`, 500);
+  }
+  return { size: listed, contentType };
+}
+
+/** Exact stored size via `ListObjectsV2` with the key as prefix. */
+async function objectSizeFromListing(key: string): Promise<number | null> {
+  const url = new URL(`${ENDPOINT}/${BUCKET}`);
+  url.searchParams.set("list-type", "2");
+  url.searchParams.set("prefix", key);
+  url.searchParams.set("max-keys", "5");
+  const res = await getClient().fetch(url.toString());
+  if (!res.ok) return null;
+  const xml = await res.text();
+  // Only accept an exact key match: the prefix could in principle match others.
+  const entry = new RegExp(`<Contents>[\\s\\S]*?<Key>${escapeXmlRe(key)}</Key>[\\s\\S]*?<Size>(\\d+)</Size>[\\s\\S]*?</Contents>`).exec(xml);
+  if (!entry) return null;
+  return Number(entry[1]);
+}
+
+function escapeXmlRe(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 export async function deleteObject(key: string): Promise<void> {
