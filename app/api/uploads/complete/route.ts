@@ -59,6 +59,32 @@ export async function POST(request: Request) {
   if (!head) {
     return NextResponse.json({ error: "Il file non risulta caricato su R2. Riprova." }, { status: 409 });
   }
+
+  // A 0-byte object means the body never arrived: R2 accepts an empty PUT, so
+  // without this check the file is registered and every download is empty.
+  if (!head.size || head.size === 0) {
+    await deleteObject(key).catch(() => undefined);
+    invalidateFilesCache();
+    return NextResponse.json(
+      { error: "Il caricamento è arrivato vuoto (0 byte). Controlla la connessione e riprova." },
+      { status: 422 },
+    );
+  }
+
+  // The browser declared a size when presigning; a mismatch means the upload was
+  // truncated in transit. Refuse it instead of storing a corrupt file.
+  const declaredSize = Number(body.size ?? 0);
+  if (declaredSize > 0 && head.size !== declaredSize) {
+    await deleteObject(key).catch(() => undefined);
+    invalidateFilesCache();
+    return NextResponse.json(
+      {
+        error: `Il file è arrivato incompleto (${head.size} byte su ${declaredSize}). Riprova il caricamento.`,
+      },
+      { status: 422 },
+    );
+  }
+
   if (head.size > MAX_UPLOAD_BYTES) {
     await deleteObject(key).catch(() => undefined);
     invalidateFilesCache();
