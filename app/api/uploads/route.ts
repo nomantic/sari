@@ -61,7 +61,9 @@ export async function POST(request: Request) {
       ? String(body.contentType)
       : "application/octet-stream";
 
-  const uploadUrl = await presignUrl(key, "PUT", 900, { contentType });
+  // Not signed with a content-type on purpose: see presignUrl. R2 stores a
+  // 0-byte object when a signed header and the sent header disagree.
+  const uploadUrl = await presignUrl(key, "PUT", 900);
 
   let duplicateName: string | null = null;
   try {

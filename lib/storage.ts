@@ -73,18 +73,14 @@ export async function presignUrl(
   key: string,
   method: "GET" | "PUT",
   expiresIn = 600,
-  extra?: { contentType?: string },
 ): Promise<string> {
   const url = new URL(objectUrl(key));
   url.searchParams.set("X-Amz-Expires", String(expiresIn));
-  const signedHeaders: Record<string, string> = {};
-  if (method === "PUT") {
-    // MUST NOT be part of the signature: browsers are allowed to send any
-    // content-type while the object stays served as an attachment (built-in
-    // Storage uses content-disposition for that reason).
-    signedHeaders["content-type"] = extra?.contentType || "application/octet-stream";
-  }
-  const signed = await getClient().sign(new Request(url, { method, headers: signedHeaders }), {
+  // Only `host` is signed. Deliberately NOT the content-type: when a signed
+  // header does not match exactly what the browser sends, R2 discards the
+  // request body and stores a 0-byte object. The real type is recorded in the
+  // manifest instead, and the download sets Content-Type from there.
+  const signed = await getClient().sign(new Request(url, { method }), {
     aws: { signQuery: true },
   });
   return signed.url;
