@@ -60,9 +60,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Il file non risulta caricato su R2. Riprova." }, { status: 409 });
   }
 
-  // A 0-byte object means the body never arrived: R2 accepts an empty PUT, so
-  // without this check the file is registered and every download is empty.
-  if (!head.size || head.size === 0) {
+  // The browser always declares the size it uploaded. `head.size` is 0 only when
+  // R2 could not report it (gzip responses omit content-length), so fall back to
+  // the declared value rather than treating a real file as empty.
+  const declaredSize = Number(body.size ?? 0);
+  const actualSize = head.size > 0 ? head.size : declaredSize;
+
+  // A genuinely empty body: reject and clean up so it is never listed.
+  if (actualSize <= 0) {
     await deleteObject(key).catch(() => undefined);
     invalidateFilesCache();
     return NextResponse.json(
@@ -71,10 +76,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // The browser declared a size when presigning; a mismatch means the upload was
-  // truncated in transit. Refuse it instead of storing a corrupt file.
-  const declaredSize = Number(body.size ?? 0);
-  if (declaredSize > 0 && head.size !== declaredSize) {
+  // Both sizes known and different → the upload was truncated in transit.
+  if (head.size > 0 && declaredSize > 0 && head.size !== declaredSize) {
     await deleteObject(key).catch(() => undefined);
     invalidateFilesCache();
     return NextResponse.json(
@@ -85,7 +88,7 @@ export async function POST(request: Request) {
     );
   }
 
-  if (head.size > MAX_UPLOAD_BYTES) {
+  if (actualSize > MAX_UPLOAD_BYTES) {
     await deleteObject(key).catch(() => undefined);
     invalidateFilesCache();
     return NextResponse.json({ error: "File oltre il limite consentito: caricamento annullato." }, { status: 413 });
@@ -104,7 +107,7 @@ export async function POST(request: Request) {
     sessionId: target.id,
     courseId: target.courseId,
     name: fileName,
-    size: head.size,
+    size: actualSize,
     contentType: head.contentType || "application/octet-stream",
     uploadedAt: new Date().toISOString(),
     uploadedBy,

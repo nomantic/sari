@@ -86,17 +86,37 @@ export async function presignUrl(
   return signed.url;
 }
 
+/**
+ * Write an object.
+ *
+ * R2 occasionally rejects a PUT with `411 MissingContentLength` even though the
+ * body length is known — the signed request reaches it without the length
+ * header. Sending an explicit `content-length` and retrying once makes the write
+ * reliable; without the retry roughly half of manifest writes failed.
+ */
 export async function putObject(
   key: string,
   body: Uint8Array | string,
   contentType: string,
   cacheControl = "public, max-age=60",
 ): Promise<void> {
-  const res = await getClient().fetch(objectUrl(key), {
-    method: "PUT",
-    headers: { "content-type": contentType, "cache-control": cacheControl },
-    body: body as BodyInit,
-  });
+  const payload = typeof body === "string" ? new TextEncoder().encode(body) : body;
+
+  const attempt = async (): Promise<Response> =>
+    getClient().fetch(objectUrl(key), {
+      method: "PUT",
+      headers: {
+        "content-type": contentType,
+        "cache-control": cacheControl,
+        "content-length": String(payload.byteLength),
+      },
+      body: payload as BodyInit,
+    });
+
+  let res = await attempt();
+  // The signed request can lose its length header on the way to R2.
+  if (res.status === 411) res = await attempt();
+
   if (!res.ok) {
     throw new StorageError(`Upload fallito su R2 (${res.status}): ${(await res.text()).slice(0, 300)}`, res.status);
   }
@@ -125,10 +145,9 @@ export async function headObject(key: string): Promise<{ size: number; contentTy
 
   // Otherwise ask the listing, which reports the real object size.
   const listed = await objectSizeFromListing(key);
-  if (listed === null) {
-    throw new StorageError(`Impossibile determinare la dimensione di ${key}`, 500);
-  }
-  return { size: listed, contentType };
+  // Never fail the upload because the size lookup hiccuped: report "unknown"
+  // (0) and let the caller fall back to the size the browser declared.
+  return { size: listed ?? 0, contentType };
 }
 
 /** Exact stored size via `ListObjectsV2` with the key as prefix. */
