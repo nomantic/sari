@@ -9,6 +9,11 @@ import { fileTypeBadge, fileTypeTone, formatBytes } from "@/lib/format";
 import { sortByUsefulness, votesOf } from "@/lib/votes";
 import { VoteButtons } from "./vote-buttons";
 
+/** Always an attachment: the browser saves the file instead of rendering it. */
+function downloadHref(key: string): string {
+  return `/api/files/download?mode=download&key=${encodeURIComponent(key)}`;
+}
+
 /**
  * Materials of one lesson or one subject. An admin may delete anything; anyone
  * else only sees "Elimina" on files this browser uploaded. The API enforces the
@@ -87,11 +92,10 @@ export function FileList({
               </span>
               <div className="min-w-0 flex-1">
                 <a
-                  href={`/api/files/download?key=${encodeURIComponent(file.key)}`}
-                  target="_blank"
-                  rel="noreferrer noopener"
+                  href={downloadHref(file.key)}
+                  download={file.name}
                   className="block truncate text-sm font-medium text-body underline-offset-4 hover:text-strong hover:underline"
-                  title={file.name}
+                  title={`Scarica ${file.name}`}
                 >
                   {file.name}
                 </a>
@@ -102,14 +106,14 @@ export function FileList({
                 </p>
                 <VoteButtons fileKey={file.key} initialUp={votes.up} initialDown={votes.down} />
               </div>
+              {/* Download saves the file straight away; preview is secondary. */}
               <a
-                href={`/api/files/download?key=${encodeURIComponent(file.key)}`}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="shrink-0 rounded-lg px-2 py-1.5 text-xs text-faint transition-colors hover:bg-surface-3 hover:text-strong"
-                aria-label={`Apri ${file.name}`}
+                href={downloadHref(file.key)}
+                download={file.name}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 text-xs font-semibold text-body transition-colors hover:border-line-strong hover:bg-surface-3 hover:text-strong"
+                aria-label={`Scarica ${file.name}`}
               >
-                Apri
+                <span aria-hidden>↓</span> Scarica
               </a>
               {(isAdmin || ownKeys.has(file.key)) &&
                 (confirmKey === file.key ? (
