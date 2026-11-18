@@ -5,7 +5,6 @@ import "./globals.css";
 import { NavSearch } from "@/components/nav-search";
 import { NavMenu } from "@/components/nav-menu";
 import { NoticesBar } from "@/components/notices-bar";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Wordmark } from "@/components/wordmark";
 import { ACADEMIC_YEAR, DEVELOPER, SOURCE_URLS } from "@/lib/constants";
 
@@ -69,7 +68,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <NavSearch compact />
               </div>
 
-              <ThemeToggle />
               <NavMenu />
             </div>
           </div>

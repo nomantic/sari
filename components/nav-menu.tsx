@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { setTheme, useTheme } from "./theme-toggle";
 
 const LINKS = [
   { href: "/", label: "Oggi", description: "Le lezioni di oggi e i prossimi giorni" },
@@ -64,8 +65,9 @@ export function NavMenu() {
         ))}
       </nav>
 
-      {/* Narrow layout: a three-line icon opens one full-width dropdown. */}
-      <div ref={wrapper} className="relative shrink-0 lg:hidden">
+      {/* Always available: on phones it holds the navigation, on desktop the
+          theme control that used to sit in the header. */}
+      <div ref={wrapper} className="relative shrink-0">
         <button
           type="button"
           onClick={() => {
@@ -135,6 +137,12 @@ export function NavMenu() {
                   </Link>
                 </li>
               ))}
+
+              {/* Theme lives here rather than in the header, so the bar stays
+                  uncluttered and the choice is always in the same place. */}
+              <li role="none" className="menu-row mt-1 border-t border-line pt-1" style={{ animationDelay: "200ms" }}>
+                <ThemeRow />
+              </li>
             </ul>
             <Link
               href="/admin"
@@ -148,7 +156,28 @@ export function NavMenu() {
           </div>
         )}
       </div>
-
     </>
+  );
+}
+
+/** Toggle row inside the menu: label on the left, current theme on the right. */
+function ThemeRow() {
+  const theme = useTheme();
+  const next = theme === "dark" ? "light" : "dark";
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(next)}
+      className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface-2"
+    >
+      <span aria-hidden className="text-base text-muted">
+        {theme === "dark" ? "☀" : "☾"}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[15px] font-medium text-body">Tema {next === "light" ? "chiaro" : "scuro"}</span>
+        <span className="mt-0.5 block text-[11px] text-faint">Ora: {theme === "dark" ? "scuro" : "chiaro"}</span>
+      </span>
+    </button>
   );
 }
