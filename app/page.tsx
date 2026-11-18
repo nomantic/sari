@@ -61,7 +61,9 @@ export default async function HomePage() {
 
         
 
-        <dl className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {/* Two per row on phones, then all five share one row from md so the
+            grid never leaves a stranded 3+2 split on tablets. */}
+        <dl className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
           {[
             { label: "Materie", value: courses.length },
             { label: "Lezioni in calendario", value: sessions.length },

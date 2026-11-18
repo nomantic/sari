@@ -26,15 +26,18 @@ export function LessonPanel({
   const router = useRouter();
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
-      <section aria-label="Materiali della lezione" className="order-2 lg:order-1">
+    /* From md (768px) the materials get the wide column and the uploader a fixed
+       side column: at that width a stacked full-width dropzone pushed the
+       actual materials below the fold. On phones the uploader stays first. */
+    <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_18rem] lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <section aria-label="Materiali della lezione" className="order-2 min-w-0 md:order-1">
         <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
           Materiali condivisi ({files.length})
         </h2>
         <FileList files={files} isAdmin={isAdmin} />
       </section>
 
-      <section aria-labelledby="carica-lezione" className="order-1 lg:order-2">
+      <section aria-labelledby="carica-lezione" className="order-1 min-w-0 md:order-2">
         <h2 id="carica-lezione" className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
           Carica per questa lezione
         </h2>

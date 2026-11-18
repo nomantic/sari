@@ -23,6 +23,9 @@ function isViewable(file: FileRecord): boolean {
   return VIEWABLE_EXTENSIONS.has(ext);
 }
 
+const ACTION_CLASS =
+  "inline-flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 text-xs font-semibold text-body transition-colors hover:border-line-strong hover:bg-surface-3 hover:text-strong";
+
 /**
  * Materials of one lesson or one subject. An admin may delete anything; anyone
  * else only sees "Elimina" on files this browser uploaded. The API enforces the
@@ -52,8 +55,8 @@ export function FileList({
     } catch {
       tokens = {};
     }
-    return new Set(files.filter((file) => typeof tokens[file.key] === "string").map((file) => file.key));
-  }, [files, tokenStore]);
+    return new Set(Object.keys(tokens));
+  }, [tokenStore]);
 
   async function remove(file: FileRecord) {
     setBusyKey(file.key);
@@ -62,7 +65,7 @@ export function FileList({
       const res = await fetch("/api/files/delete", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ key: file.key, token: getDeletionToken(file.key) }),
+        body: JSON.stringify({ key: file.key, token: getDeletionToken(file.key) ?? undefined }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Eliminazione non riuscita.");
@@ -93,94 +96,113 @@ export function FileList({
           const tone = fileTypeTone[badge] ?? "bg-surface-2 text-muted ring-line";
           const votes = votesOf(file);
           const viewable = isViewable(file);
+          const canDelete = isAdmin || ownKeys.has(file.key);
+
           return (
+            /* One row that wraps: the badge and text sit on the first line, the
+               actions flow onto the next line only when the column is too narrow
+               for them. A container query reacts to THIS column's width, which
+               is what matters — the viewport says nothing about it. */
             <li
               key={file.key}
-              className="group flex items-start gap-3 rounded-xl border border-line bg-surface-2 px-3 py-2.5 transition-colors hover:border-line-strong"
+              className="@container rounded-xl border border-line bg-surface-2 px-3 py-2.5 transition-colors hover:border-line-strong"
             >
-              <span className={`grid h-9 w-12 shrink-0 place-items-center rounded-lg text-[10px] font-bold ring-1 ring-inset ${tone}`}>
-                {badge}
-              </span>
-              <div className="min-w-0 flex-1">
-                {viewable ? (
-                  /* A text note opens in the reader instead of downloading. */
-                  <button
-                    type="button"
-                    onClick={() => setReading(file)}
-                    className="block max-w-full truncate text-left text-sm font-medium text-body underline-offset-4 hover:text-strong hover:underline"
-                    title={`Leggi ${file.name}`}
-                  >
-                    {file.name}
-                  </button>
-                ) : (
+              <div className="flex flex-wrap items-start gap-x-3 gap-y-2">
+                <span className={`grid h-9 w-12 shrink-0 place-items-center rounded-lg text-[10px] font-bold ring-1 ring-inset ${tone}`}>
+                  {badge}
+                </span>
+
+                <div className="min-w-0 flex-1 basis-40">
+                  {viewable ? (
+                    /* A text note opens in the reader instead of downloading. */
+                    <button
+                      type="button"
+                      onClick={() => setReading(file)}
+                      className="block w-full truncate text-left text-sm font-medium text-body underline-offset-4 hover:text-strong hover:underline"
+                      title={`Leggi ${file.name}`}
+                    >
+                      {file.name}
+                    </button>
+                  ) : (
+                    <a
+                      href={downloadHref(file.key)}
+                      download={file.name}
+                      className="block w-full truncate text-sm font-medium text-body underline-offset-4 hover:text-strong hover:underline"
+                      title={`Scarica ${file.name}`}
+                    >
+                      {file.name}
+                    </a>
+                  )}
+                  {/* Meta and votes share a line on wide rows, so the row stays
+                      compact instead of stacking four blocks. */}
+                  <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <p className="min-w-0 truncate text-[11px] text-faint">
+                      {formatBytes(file.size)}
+                      {file.uploadedBy ? ` · ${file.uploadedBy}` : ""}
+                      {file.note ? ` · ${file.note}` : ""}
+                    </p>
+                    <VoteButtons fileKey={file.key} initialUp={votes.up} initialDown={votes.down} compact />
+                  </div>
+                </div>
+
+                {/* Actions: beside the name when there is room, otherwise a
+                    wrapped row underneath that aligns with the text. */}
+                <div className="flex w-full flex-wrap items-center gap-1.5 @[23rem]:w-auto">
+                  {viewable && (
+                    <button
+                      type="button"
+                      onClick={() => setReading(file)}
+                      className={ACTION_CLASS}
+                      aria-label={`Leggi ${file.name}`}
+                    >
+                      <span aria-hidden>▤</span> Leggi
+                    </button>
+                  )}
                   <a
                     href={downloadHref(file.key)}
                     download={file.name}
-                    className="block truncate text-sm font-medium text-body underline-offset-4 hover:text-strong hover:underline"
-                    title={`Scarica ${file.name}`}
+                    className={ACTION_CLASS}
+                    aria-label={`Scarica ${file.name}`}
                   >
-                    {file.name}
+                    <span aria-hidden>↓</span> Scarica
                   </a>
-                )}
-                <p className="mt-0.5 truncate text-[11px] text-faint">
-                  {formatBytes(file.size)}
-                  {file.uploadedBy ? ` · ${file.uploadedBy}` : ""}
-                  {file.note ? ` · ${file.note}` : ""}
-                </p>
-                <VoteButtons fileKey={file.key} initialUp={votes.up} initialDown={votes.down} />
+                  {canDelete &&
+                    (confirmKey === file.key ? (
+                      <>
+                        <button
+                          type="button"
+                          className="rounded-lg bg-red-500/20 px-2.5 py-1.5 text-xs font-semibold text-red-200 hover:bg-red-500/30 disabled:opacity-50"
+                          onClick={() => remove(file)}
+                          disabled={busyKey === file.key}
+                        >
+                          {busyKey === file.key ? "…" : "Conferma"}
+                        </button>
+                        <button
+                          type="button"
+                          className="rounded-lg px-2 py-1.5 text-xs text-faint hover:text-strong"
+                          onClick={() => setConfirmKey(null)}
+                        >
+                          Annulla
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className="rounded-lg px-2 py-1.5 text-xs text-red-300/70 hover:bg-red-500/10 hover:text-red-300"
+                        onClick={() => setConfirmKey(file.key)}
+                        aria-label={`Elimina ${file.name}`}
+                      >
+                        Elimina
+                      </button>
+                    ))}
+                </div>
               </div>
-              {/* Text can be read in place; everything else downloads. */}
-              {viewable && (
-                <button
-                  type="button"
-                  onClick={() => setReading(file)}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 text-xs font-semibold text-body transition-colors hover:border-line-strong hover:bg-surface-3 hover:text-strong"
-                  aria-label={`Leggi ${file.name}`}
-                >
-                  <span aria-hidden>▤</span> Leggi
-                </button>
-              )}
-              <a
-                href={downloadHref(file.key)}
-                download={file.name}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 text-xs font-semibold text-body transition-colors hover:border-line-strong hover:bg-surface-3 hover:text-strong"
-                aria-label={`Scarica ${file.name}`}
-              >
-                <span aria-hidden>↓</span> Scarica
-              </a>
-              {(isAdmin || ownKeys.has(file.key)) &&
-                (confirmKey === file.key ? (
-                  <div className="flex shrink-0 items-center gap-1">
-                    <button
-                      type="button"
-                      className="rounded-lg bg-red-500/20 px-2.5 py-1.5 text-xs font-semibold text-red-200 hover:bg-red-500/30"
-                      onClick={() => remove(file)}
-                      disabled={busyKey === file.key}
-                    >
-                      {busyKey === file.key ? "…" : "Conferma"}
-                    </button>
-                    <button type="button" className="rounded-lg px-2 py-1.5 text-xs text-faint hover:text-strong" onClick={() => setConfirmKey(null)}>
-                      Annulla
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    className="shrink-0 rounded-lg px-2 py-1.5 text-xs text-red-300/70 hover:bg-red-500/10 hover:text-red-300"
-                    onClick={() => setConfirmKey(file.key)}
-                    aria-label={`Elimina ${file.name}`}
-                  >
-                    Elimina
-                  </button>
-                ))}
             </li>
           );
         })}
       </ul>
 
-      {reading && (
-        <TextViewer fileKey={reading.key} name={reading.name} onClose={() => setReading(null)} />
-      )}
+      {reading && <TextViewer fileKey={reading.key} name={reading.name} onClose={() => setReading(null)} />}
     </div>
   );
 }
