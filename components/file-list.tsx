@@ -8,10 +8,19 @@ import type { FileRecord } from "@/lib/types";
 import { fileTypeBadge, fileTypeTone, formatBytes } from "@/lib/format";
 import { sortByUsefulness, votesOf } from "@/lib/votes";
 import { VoteButtons } from "./vote-buttons";
+import { TextViewer } from "./text-viewer";
 
 /** Always an attachment: the browser saves the file instead of rendering it. */
 function downloadHref(key: string): string {
   return `/api/files/download?mode=download&key=${encodeURIComponent(key)}`;
+}
+
+/** Plain text can be shown in the reader instead of downloaded. */
+const VIEWABLE_EXTENSIONS = new Set(["txt", "md", "csv"]);
+
+function isViewable(file: FileRecord): boolean {
+  const ext = file.name.slice(file.name.lastIndexOf(".") + 1).toLowerCase();
+  return VIEWABLE_EXTENSIONS.has(ext);
 }
 
 /**
@@ -32,6 +41,7 @@ export function FileList({
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reading, setReading] = useState<FileRecord | null>(null);
 
   // Tokens live in localStorage; the hook re-renders when they change.
   const tokenStore = useLocalStorageValue("sari-deletion-tokens");
@@ -82,6 +92,7 @@ export function FileList({
           const badge = fileTypeBadge(file);
           const tone = fileTypeTone[badge] ?? "bg-surface-2 text-muted ring-line";
           const votes = votesOf(file);
+          const viewable = isViewable(file);
           return (
             <li
               key={file.key}
@@ -91,14 +102,26 @@ export function FileList({
                 {badge}
               </span>
               <div className="min-w-0 flex-1">
-                <a
-                  href={downloadHref(file.key)}
-                  download={file.name}
-                  className="block truncate text-sm font-medium text-body underline-offset-4 hover:text-strong hover:underline"
-                  title={`Scarica ${file.name}`}
-                >
-                  {file.name}
-                </a>
+                {viewable ? (
+                  /* A text note opens in the reader instead of downloading. */
+                  <button
+                    type="button"
+                    onClick={() => setReading(file)}
+                    className="block max-w-full truncate text-left text-sm font-medium text-body underline-offset-4 hover:text-strong hover:underline"
+                    title={`Leggi ${file.name}`}
+                  >
+                    {file.name}
+                  </button>
+                ) : (
+                  <a
+                    href={downloadHref(file.key)}
+                    download={file.name}
+                    className="block truncate text-sm font-medium text-body underline-offset-4 hover:text-strong hover:underline"
+                    title={`Scarica ${file.name}`}
+                  >
+                    {file.name}
+                  </a>
+                )}
                 <p className="mt-0.5 truncate text-[11px] text-faint">
                   {formatBytes(file.size)}
                   {file.uploadedBy ? ` · ${file.uploadedBy}` : ""}
@@ -106,7 +129,17 @@ export function FileList({
                 </p>
                 <VoteButtons fileKey={file.key} initialUp={votes.up} initialDown={votes.down} />
               </div>
-              {/* Download saves the file straight away; preview is secondary. */}
+              {/* Text can be read in place; everything else downloads. */}
+              {viewable && (
+                <button
+                  type="button"
+                  onClick={() => setReading(file)}
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 text-xs font-semibold text-body transition-colors hover:border-line-strong hover:bg-surface-3 hover:text-strong"
+                  aria-label={`Leggi ${file.name}`}
+                >
+                  <span aria-hidden>▤</span> Leggi
+                </button>
+              )}
               <a
                 href={downloadHref(file.key)}
                 download={file.name}
@@ -144,6 +177,10 @@ export function FileList({
           );
         })}
       </ul>
+
+      {reading && (
+        <TextViewer fileKey={reading.key} name={reading.name} onClose={() => setReading(null)} />
+      )}
     </div>
   );
 }
