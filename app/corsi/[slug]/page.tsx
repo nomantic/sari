@@ -142,7 +142,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
         <div className="mt-4 flex flex-wrap gap-2">
           <a href="#materiali-esame" className="btn-primary text-xs">
-            🎓 Materiali d&apos;esame ({examCount})
+            Materiali d&apos;esame ({examCount})
           </a>
           <a href="#lezioni" className="btn-ghost text-xs">
             Lezioni ({course.sessions.length})

@@ -145,7 +145,7 @@ export default async function StatsPage() {
                 </Link>
                 <span className="shrink-0 text-[11px] tabular-nums text-faint">
                   {row.covered}/{row.lessons} lezioni · {row.files} materiali
-                  {row.exams > 0 ? ` · 🎓 ${row.exams}` : ""}
+                  {row.exams > 0 ? ` · esame: ${row.exams}` : ""}
                 </span>
                 <span className="w-10 shrink-0 text-right text-xs font-semibold tabular-nums text-muted">{row.coverage}%</span>
               </div>

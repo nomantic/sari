@@ -114,7 +114,7 @@ export default async function HomePage() {
                     }`}
                     title={`Materiali d'esame (${exams})`}
                   >
-                    🎓 {exams > 0 ? exams : "Esame"}
+                    {exams > 0 ? `Esame · ${exams}` : "Esame"}
                   </Link>
                 </div>
               );

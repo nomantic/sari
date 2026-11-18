@@ -133,7 +133,7 @@ export function UploadWizard({ courses, yearLabels, defaultCourse, today, upload
             aria-label="Scegli la lezione per data e ora, oppure i materiali d'esame"
           >
             <option value="">— Scegli data e ora —</option>
-            <option value={`exam:${course.id}`}>🎓 Materiali d&apos;esame (per tutta la materia)</option>
+            <option value={`exam:${course.id}`}>Materiali d&apos;esame (per tutta la materia)</option>
             {sessionOptions.map((s) => (
               <option key={s.id} value={s.id}>
                 {label(s)} — {s.room}
