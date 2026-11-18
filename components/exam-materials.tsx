@@ -32,23 +32,31 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
       className="surface scroll-mt-24 overflow-hidden border-gold-400/25 bg-gradient-to-br from-gold-400/10 to-transparent"
       aria-labelledby="materiali-esame-title"
     >
-      <div className="flex items-start gap-3 p-4 sm:gap-4 sm:p-5">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gold-400/30 bg-gold-400/15 text-lg sm:h-12 sm:w-12 sm:text-xl" aria-hidden>
-          🎓
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 id="materiali-esame-title" className="text-base font-semibold text-strong">
-              Materiali d&apos;esame
-            </h2>
-            <span className="chip bg-gold-400/15 text-gold-400 ring-gold-400/30">Per tutta la materia</span>
-            {files.length > 0 && (
-              <span className="chip bg-emerald-500/15 text-emerald-300 ring-emerald-500/30">
-                {files.length} {files.length === 1 ? "file" : "file"} · {formatBytes(totalBytes)}
-              </span>
-            )}
+      {/* Layout: icon and heading share the first line; the description and the
+          stats then run full width beneath. Putting the icon beside the whole
+          text block left an empty gap next to the shorter lines. */}
+      <div className="p-4 sm:p-5">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-gold-400/30 bg-gold-400/15 text-base sm:h-11 sm:w-11 sm:text-lg" aria-hidden>
+            🎓
           </div>
-          <p className="mt-1.5 max-w-2xl text-sm text-muted">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 id="materiali-esame-title" className="text-base font-semibold text-strong">
+                Materiali d&apos;esame
+              </h2>
+              <span className="chip bg-gold-400/15 text-gold-400 ring-gold-400/30">Per tutta la materia</span>
+              {files.length > 0 && (
+                <span className="chip bg-emerald-500/15 text-emerald-300 ring-emerald-500/30">
+                  {files.length} {files.length === 1 ? "file" : "file"} · {formatBytes(totalBytes)}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-2 sm:mt-2.5">
+          <p className="max-w-2xl text-sm text-muted">
             Tutto ciò che serve per l&apos;esame di <strong className="text-strong">{courseName}</strong>: slide complete,
             riassunti, prove d&apos;esame passate, domande frequenti. Non legato a una singola lezione.
           </p>
