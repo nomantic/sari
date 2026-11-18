@@ -171,10 +171,6 @@ async function objectSizeFromListing(key: string): Promise<number | null> {
   return Number(entry[1]);
 }
 
-function escapeXmlRe(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 export async function deleteObject(key: string): Promise<void> {
   const res = await getClient().fetch(objectUrl(key), { method: "DELETE" });
   if (!res.ok && res.status !== 404) {

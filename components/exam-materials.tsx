@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Uploader } from "./uploader";
+import { NoteEditor } from "./note-editor";
 import { FileList } from "./file-list";
 import type { FileRecord } from "@/lib/types";
 import { formatBytes } from "@/lib/format";
@@ -94,6 +95,14 @@ export function ExamMaterials({ courseId, courseName, files, uploadsEnabled, sta
             disabled={!uploadsEnabled}
             onUploaded={() => router.refresh()}
           />
+          <div className="mt-3">
+            <NoteEditor
+              sessionId={`exam:${courseId}`}
+              sessionLabel={`l'esame di ${courseName}`}
+              disabled={!uploadsEnabled}
+              onSaved={() => router.refresh()}
+            />
+          </div>
         </section>
       </div>
     </section>

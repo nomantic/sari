@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FileList } from "./file-list";
+import { NoteEditor } from "./note-editor";
 import { Uploader } from "./uploader";
 import type { FileRecord } from "@/lib/types";
 
@@ -43,6 +44,15 @@ export function LessonPanel({
           disabled={uploadsEnabled ? undefined : true}
           onUploaded={() => router.refresh()}
         />
+        {/* Writing a note is the lighter alternative to uploading a file. */}
+        <div className="mt-3">
+          <NoteEditor
+            sessionId={sessionId}
+            sessionLabel={sessionLabel}
+            disabled={!uploadsEnabled}
+            onSaved={() => router.refresh()}
+          />
+        </div>
       </section>
     </div>
   );
