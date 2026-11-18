@@ -24,10 +24,7 @@ export default async function HomePage() {
   }
 
   const entries = sessions.map((session) => ({ session, files: bySession.get(session.id) ?? [] }));
-  const totalFiles = entries.reduce((sum, entry) => sum + entry.files.length, 0);
-  const examFiles = courses.reduce((sum, course) => sum + (bySession.get(examTargetId(course.id))?.length ?? 0), 0);
   const upcoming = sessions.filter((s) => s.date >= today);
-  const lessonsWithFiles = sessions.filter((s) => (bySession.get(s.id)?.length ?? 0) > 0).length;
   const nextLesson = upcoming[0];
 
   return (
@@ -58,25 +55,6 @@ export default async function HomePage() {
             Vedi le materie
           </Link>
         </div>
-
-        
-
-        {/* Two per row on phones, then all five share one row from md so the
-            grid never leaves a stranded 3+2 split on tablets. */}
-        <dl className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-          {[
-            { label: "Materie", value: courses.length },
-            { label: "Lezioni in calendario", value: sessions.length },
-            { label: "Materiali delle lezioni", value: totalFiles },
-            { label: "Materiali d'esame", value: examFiles },
-            { label: "Lezioni con materiali", value: lessonsWithFiles },
-          ].map((stat) => (
-            <div key={stat.label} className="surface px-4 py-3">
-              <dt className="text-[11px] font-medium uppercase tracking-wider text-faint">{stat.label}</dt>
-              <dd className="mt-1 text-2xl font-bold tabular-nums text-strong">{stat.value}</dd>
-            </div>
-          ))}
-        </dl>
 
         {!storageOk && (
           <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">

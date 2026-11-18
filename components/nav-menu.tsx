@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/calendario", label: "Calendario", description: "Vista mensile: clicca un giorno" },
   { href: "/avvisi", label: "Avvisi", description: "Comunicazioni per tutti" },
   { href: "/corsi", label: "Materie", description: "Tutti gli insegnamenti" },
+  { href: "/statistiche", label: "Statistiche", description: "Copertura e materiali per materia" },
   { href: "/carica", label: "Carica materiale", description: "Pubblica slide o appunti" },
 ];
 
